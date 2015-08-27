@@ -58,7 +58,7 @@
     "ext-curl": "*"
   },
   "require-dev": {
-    "basho/riak": "2.*",
+    "basho/riak": "dev-pb_support",
     "basho/riak_pb": "2.0",
     "phpunit/phpunit": "4.5.*",
     "apigen/apigen": "4.1.*",
