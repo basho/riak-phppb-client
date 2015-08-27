@@ -58,9 +58,10 @@
     "ext-curl": "*"
   },
   "require-dev": {
+    "basho/riak": "2.*",
+    "basho/riak_pb": "2.0",
     "phpunit/phpunit": "4.5.*",
     "apigen/apigen": "4.1.*",
-    "allegro/protobuf": "dev-composer",
-    "basho/riak_pb": "2.0"
+    "allegro/protobuf": "dev-composer"
   }
 }

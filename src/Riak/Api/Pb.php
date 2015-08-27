@@ -24,6 +24,9 @@ use Basho\Riak\Command;
 use Basho\Riak\Exception;
 use Basho\Riak\Location;
 use Basho\Riak\Node;
+use Riak\Api\Pb\Messages\RpbContent;
+use Riak\Api\Pb\Messages\RpbPair;
+use Riak\Api\Pb\Messages\RpbPutReq;
 
 /**
  * Handles communications between end user app & Riak PB API using persistent sockets
@@ -39,6 +42,13 @@ class Pb extends Api implements ApiInterface
      */
     protected $connection = null;
 
+    /**
+     * PB message to be sent
+     *
+     * @var null
+     */
+    protected $message = null;
+
     public function closeConnection()
     {
         fclose($this->connection);
@@ -46,7 +56,7 @@ class Pb extends Api implements ApiInterface
     }
 
     /**
-     * Prepare request to be sentphp
+     * Prepare request to be sent
      *
      * @param Command $command
      * @param Node $node
@@ -67,103 +77,101 @@ class Pb extends Api implements ApiInterface
     }
 
     /**
-     * Sets the API path for the command
+     * Sets up the PB message to be sent over the wire
      *
      * @return $this
+     * @throws Exception
      */
-    protected function buildPath()
+    protected function prepareMessage()
     {
-        $bucket = null;
-        $key = '';
+        $message = null;
 
-        $bucket = $this->command->getBucket();
-
-        $location = $this->command->getLocation();
-        if (!empty($location) && $location instanceof Location) {
-            $key = $location->getKey();
-        }
         switch (get_class($this->command)) {
             case 'Basho\Riak\Command\Bucket\List':
-                $this->path = sprintf('/types/%s/buckets/%s', $bucket->getType(), $bucket->getName());
-                break;
             case 'Basho\Riak\Command\Bucket\Fetch':
             case 'Basho\Riak\Command\Bucket\Store':
             case 'Basho\Riak\Command\Bucket\Delete':
-                $this->path = sprintf('/types/%s/buckets/%s/props', $bucket->getType(), $bucket->getName());
-                break;
             case 'Basho\Riak\Command\Bucket\Keys':
-                $this->path = sprintf('/types/%s/buckets/%s/keys', $bucket->getType(), $bucket->getName());
-                break;
             case 'Basho\Riak\Command\Object\Fetch':
-            case 'Basho\Riak\Command\Object\Store':
-            case 'Basho\Riak\Command\Object\Delete':
-                $this->path = sprintf('/types/%s/buckets/%s/keys/%s', $bucket->getType(), $bucket->getName(), $key);
+                throw new \Basho\Riak\Api\Exception('Not implemented at this time.');
                 break;
+            case 'Basho\Riak\Command\Object\Store':
+                $message = new RpbPutReq();
+                $message->setContent($this->prepareContent());
+               break;
+            case 'Basho\Riak\Command\Object\Delete':
             case 'Basho\Riak\Command\DataType\Counter\Fetch':
             case 'Basho\Riak\Command\DataType\Counter\Store':
             case 'Basho\Riak\Command\DataType\Set\Fetch':
             case 'Basho\Riak\Command\DataType\Set\Store':
             case 'Basho\Riak\Command\DataType\Map\Fetch':
             case 'Basho\Riak\Command\DataType\Map\Store':
-            $this->path = sprintf('/types/%s/buckets/%s/datatypes/%s', $bucket->getType(), $bucket->getName(),
-                $key);
-                break;
             case 'Basho\Riak\Command\Search\Index\Fetch':
             case 'Basho\Riak\Command\Search\Index\Store':
             case 'Basho\Riak\Command\Search\Index\Delete':
-                $this->path = sprintf('/search/index/%s', $this->command);
-                break;
             case 'Basho\Riak\Command\Search\Schema\Fetch':
             case 'Basho\Riak\Command\Search\Schema\Store':
-                $this->path = sprintf('/search/schema/%s', $this->command);
-                break;
             case 'Basho\Riak\Command\Search\Fetch':
-                $this->path = sprintf('/search/query/%s', $this->command);
-                break;
             case 'Basho\Riak\Command\MapReduce\Fetch':
-                $this->path = sprintf('/%s', $this->config['mapred_prefix']);
-                break;
             case 'Basho\Riak\Command\Indexes\Query':
-                $this->path = $this->createIndexQueryPath($bucket);
+                throw new \Basho\Riak\Api\Exception('Not implemented at this time.');
                 break;
             default:
-                $this->path = '';
+                throw new \Basho\Riak\Api\Exception('Command is invalid.');
         }
+
+        $location = $this->command->getLocation();
+        if (!empty($location) && $location instanceof Location) {
+            $message->setKey($location->getKey());
+            $message->setBucket($location->getBucket()->getName());
+            $message->setType($location->getBucket()->getType());
+        } elseif ($this->command->getBucket()) {
+            $message->setBucket($this->command->getBucket()->getName());
+            $message->setType($this->command->getBucket()->getType());
+        }
+
 
         return $this;
     }
 
     /**
-     * Generates the URL path for a 2i Query
+     * Prepares the Riak PB message structure
      *
-     * @param Bucket $bucket
-     * @return string
-     * @throws Exception if 2i query is invalid.
+     * @return RpbContent
      */
-    private function createIndexQueryPath(Bucket $bucket)
+    protected function prepareContent()
     {
-        /**  @var Command\Indexes\Query $command */
+        /** @var Command\Object $command */
         $command = $this->command;
 
-        if($command->isMatchQuery()) {
-            $path =  sprintf('/types/%s/buckets/%s/index/%s/%s', $bucket->getType(),
-                        $bucket->getName(),
-                        $command->getIndexName(),
-                        $command->getMatchValue());
-        }
-        elseif($command->isRangeQuery()) {
-            $path =  sprintf('/types/%s/buckets/%s/index/%s/%s/%s', $bucket->getType(),
-                        $bucket->getName(),
-                        $command->getIndexName(),
-                        $command->getLowerBound(),
-                        $command->getUpperBound());
-        }
-        else
-        {
-            throw new Exception("Invalid Secondary Index Query.");
+        $content = new RpbContent();
+        $content->setValue($command->getData());
+        $content->setContentType($command->getObject()->getContentType());
+        $content->setCharset($command->getObject()->getCharset());
+        $content->setContentEncoding($command->getObject()->getContentEncoding());
+
+        // append secondary indexes to the Content object
+        foreach ($command->getObject()->getIndexes() as $key => $value) {
+            $content->appendIndexes($this->toRpbPair($key, $value));
         }
 
-        return $path;
+        return $content;
+    }
+
+    /**
+     * Converts to Riak PB Pair message structure
+     *
+     * @param $key
+     * @param $value
+     * @return RpbPair
+     */
+    protected function toRpbPair($key, $value)
+    {
+        $pair = new RpbPair();
+        $pair->setKey($key);
+        $pair->setValue($value);
+
+        return $pair;
     }
 
     /**
@@ -175,7 +183,7 @@ class Pb extends Api implements ApiInterface
      */
     protected function prepareRequest()
     {
-        return $this->prepareRequestData();
+        return $this->prepareMessage();
     }
 
     /**
