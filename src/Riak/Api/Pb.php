@@ -19,14 +19,10 @@ namespace Basho\Riak\Api;
 
 use Basho\Riak\Api;
 use Basho\Riak\ApiInterface;
-use Basho\Riak\Bucket;
 use Basho\Riak\Command;
-use Basho\Riak\Exception;
 use Basho\Riak\Location;
 use Basho\Riak\Node;
-use Riak\Api\Pb\Messages\RpbContent;
-use Riak\Api\Pb\Messages\RpbPair;
-use Riak\Api\Pb\Messages\RpbPutReq;
+use Basho\Riak\Object;
 
 /**
  * Handles communications between end user app & Riak PB API using persistent sockets
@@ -43,11 +39,23 @@ class Pb extends Api implements ApiInterface
     protected $connection = null;
 
     /**
+     * @var int
+     */
+    protected $messageCode = 0;
+
+    /**
      * PB message to be sent
      *
-     * @var null
+     * @var \ProtobufMessage|null
      */
-    protected $message = null;
+    protected $requestMessage = null;
+
+    /**
+     * PB response received
+     *
+     * @var \ProtobufMessage|null
+     */
+    protected $responseMessage = null;
 
     public function closeConnection()
     {
@@ -70,8 +78,8 @@ class Pb extends Api implements ApiInterface
 
         $this->openConnection();
 
-        // request specific connection preparation
-        $this->prepareRequest();
+        // determine message code and build message content
+        $this->prepareMessage();
 
         return $this;
     }
@@ -80,7 +88,7 @@ class Pb extends Api implements ApiInterface
      * Sets up the PB message to be sent over the wire
      *
      * @return $this
-     * @throws Exception
+     * @throws Api\Exception
      */
     protected function prepareMessage()
     {
@@ -88,36 +96,78 @@ class Pb extends Api implements ApiInterface
 
         switch (get_class($this->command)) {
             case 'Basho\Riak\Command\Bucket\List':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Bucket\Fetch':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Bucket\Store':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Bucket\Delete':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Bucket\Keys':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Object\Fetch':
-                throw new \Basho\Riak\Api\Exception('Not implemented at this time.');
+                $this->messageCode = Api\Pb\Message\Codes::RpbGetReq;
                 break;
             case 'Basho\Riak\Command\Object\Store':
-                $message = new RpbPutReq();
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $message = new Api\Pb\Message\RpbPutReq();
                 $message->setContent($this->prepareContent());
                break;
             case 'Basho\Riak\Command\Object\Delete':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\DataType\Counter\Fetch':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\DataType\Counter\Store':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\DataType\Set\Fetch':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\DataType\Set\Store':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\DataType\Map\Fetch':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\DataType\Map\Store':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Search\Index\Fetch':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Search\Index\Store':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Search\Index\Delete':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Search\Schema\Fetch':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Search\Schema\Store':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Search\Fetch':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\MapReduce\Fetch':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                break;
             case 'Basho\Riak\Command\Indexes\Query':
-                throw new \Basho\Riak\Api\Exception('Not implemented at this time.');
+                throw new Api\Exception('Not implemented at this time.');
+                break;
+            case 'Basho\Riak\Command\Ping':
+                $message = '';
                 break;
             default:
-                throw new \Basho\Riak\Api\Exception('Command is invalid.');
+                throw new Api\Exception('Command is invalid.');
         }
 
         $location = $this->command->getLocation();
@@ -130,22 +180,29 @@ class Pb extends Api implements ApiInterface
             $message->setType($this->command->getBucket()->getType());
         }
 
+        $this->requestMessage = $message;
 
         return $this;
+    }
+
+    protected function packMessage($code, $payload = '')
+    {
+        // https://github.com/basho/riak_pb#protocol
+        return pack("NC", 1 + strlen($payload), $code) . $payload;
     }
 
     /**
      * Prepares the Riak PB message structure
      *
-     * @return RpbContent
+     * @return Api\Pb\Message\RpbContent
      */
     protected function prepareContent()
     {
         /** @var Command\Object $command */
         $command = $this->command;
 
-        $content = new RpbContent();
-        $content->setValue($command->getData());
+        $content = new Api\Pb\Message\RpbContent();
+        $content->setValue($command->getEncodedData());
         $content->setContentType($command->getObject()->getContentType());
         $content->setCharset($command->getObject()->getCharset());
         $content->setContentEncoding($command->getObject()->getContentEncoding());
@@ -163,45 +220,90 @@ class Pb extends Api implements ApiInterface
      *
      * @param $key
      * @param $value
-     * @return RpbPair
+     * @return Api\Pb\Message\RpbPair
      */
     protected function toRpbPair($key, $value)
     {
-        $pair = new RpbPair();
+        $pair = new Api\Pb\Message\RpbPair();
         $pair->setKey($key);
         $pair->setValue($value);
 
         return $pair;
     }
 
-    /**
-     * Prepare request
-     *
-     * Sets connection options that are specific to this request
-     *
-     * @return $this
-     */
-    protected function prepareRequest()
-    {
-        return $this->prepareMessage();
-    }
-
-    /**
-     * Prepare request data
-     *
-     * @return $this
-     */
-    protected function prepareRequestData()
-    {
-        $this->requestBody = $this->command->getEncodedData();
-
-        return $this;
-    }
-
     public function send()
     {
+        $response = '';
+
+        $written = fwrite($this->connection, $this->requestMessage->serializeToString());
+        if (!$written) {
+            throw new Api\Exception('Failed to write to socket.');
+        }
+
+        // receive data - in small chunks :)
+        while (!feof($this->connection))
+        {
+            $response .= fgets($this->connection, 128);
+            if (!$response) {
+                break;
+            }
+        }
+
+        if (!$response) {
+            throw new Api\Exception('Empty response from socket.');
+        }
+
+        $this->parseResponse($response);
 
         return $this->success;
+    }
+
+    /**
+     * @param string $response
+     * @throws Api\Exception
+     */
+    protected function parseResponse($response = '')
+    {
+        switch (substr($response, 0, 1)) {
+            case '0':
+                $message = new Api\Pb\Message\RpbErrorResp();
+                $message->parseFromString($response);
+                $this->success = false;
+                $this->error = $message->getErrmsg();
+                $this->response = new Command\Response($this->success, $message->getErrcode(), $this->error);
+                break;
+            case '12':
+                $location = null;
+                $message = new Api\Pb\Message\RpbPutResp();
+                $message->parseFromString($response);
+
+                if ($message->getKey()) {
+                    $location = new Location($message->getKey(), $this->getCommand()->getBucket());
+                }
+
+                $objects = [];
+                foreach ($message->getContent() as $content) {
+                    /** @var Command\Object $command */
+                    $command = $this->command;
+
+                    $object = (new Object)
+                        ->setData($command->getDecodedData($content->getValue(), $content->getContentType()))
+                        ->setContentType($content->getContentType())
+                        ->setContentEncoding($content->getContentEncoding())
+                        ->setVclock($message->getVclock());
+
+                    // TODO: add index values
+
+                    // TODO: add user meta data
+
+                    $objects[] = $object;
+                }
+
+                $this->response = new Command\Object\Response($this->success, 200, '', $location, $objects);
+                break;
+            default:
+                throw new Api\Exception('Mishandled PB response.');
+        }
     }
 
     public function openConnection()
@@ -209,9 +311,9 @@ class Pb extends Api implements ApiInterface
         $protocol = $this->node->useTls() ? 'tls' : 'tcp';
         $socket = sprintf('%s://%s', $protocol, $this->node->getUri());
 
-        $this->connection = stream_socket_client($socket, $errNo, $errMsg, $this->node->getTimeout(), STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT);
+        $this->connection = stream_socket_client($socket, $errNo, $errMsg, 30, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT);
         if ($errNo) {
-            throw new \Basho\Riak\Api\Exception($errMsg);
+            throw new Api\Exception($errNo . ' - ' . $errMsg);
         }
 
         return $this;
