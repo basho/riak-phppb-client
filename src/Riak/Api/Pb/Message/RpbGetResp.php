@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbGetResp message
  */
@@ -21,7 +21,7 @@ class RpbGetResp extends \ProtobufMessage
         self::CONTENT => array(
             'name' => 'content',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbContent'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbContent'
         ),
         self::VCLOCK => array(
             'name' => 'vclock',
@@ -70,11 +70,11 @@ class RpbGetResp extends \ProtobufMessage
     /**
      * Appends value to 'content' list
      *
-     * @param \Riak\Api\Pb\Messages\RpbContent $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\RpbContent $value Value to append
      *
      * @return null
      */
-    public function appendContent(\Riak\Api\Pb\Messages\RpbContent $value)
+    public function appendContent(\Basho\Riak\Api\Pb\Message\RpbContent $value)
     {
         return $this->append(self::CONTENT, $value);
     }
@@ -92,7 +92,7 @@ class RpbGetResp extends \ProtobufMessage
     /**
      * Returns 'content' list
      *
-     * @return \Riak\Api\Pb\Messages\RpbContent[]
+     * @return \Basho\Riak\Api\Pb\Message\RpbContent[]
      */
     public function getContent()
     {
@@ -114,7 +114,7 @@ class RpbGetResp extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\RpbContent
+     * @return \Basho\Riak\Api\Pb\Message\RpbContent
      */
     public function getContentAt($offset)
     {

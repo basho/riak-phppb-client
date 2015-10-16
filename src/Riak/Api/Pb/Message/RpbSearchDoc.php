@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbSearchDoc message
  */
@@ -19,7 +19,7 @@ class RpbSearchDoc extends \ProtobufMessage
         self::FIELDS => array(
             'name' => 'fields',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbPair'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbPair'
         ),
     );
 
@@ -56,11 +56,11 @@ class RpbSearchDoc extends \ProtobufMessage
     /**
      * Appends value to 'fields' list
      *
-     * @param \Riak\Api\Pb\Messages\RpbPair $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\RpbPair $value Value to append
      *
      * @return null
      */
-    public function appendFields(\Riak\Api\Pb\Messages\RpbPair $value)
+    public function appendFields(\Basho\Riak\Api\Pb\Message\RpbPair $value)
     {
         return $this->append(self::FIELDS, $value);
     }
@@ -78,7 +78,7 @@ class RpbSearchDoc extends \ProtobufMessage
     /**
      * Returns 'fields' list
      *
-     * @return \Riak\Api\Pb\Messages\RpbPair[]
+     * @return \Basho\Riak\Api\Pb\Message\RpbPair[]
      */
     public function getFields()
     {
@@ -100,7 +100,7 @@ class RpbSearchDoc extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\RpbPair
+     * @return \Basho\Riak\Api\Pb\Message\RpbPair
      */
     public function getFieldsAt($offset)
     {

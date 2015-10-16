@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbContent message
  */
@@ -54,7 +54,7 @@ class RpbContent extends \ProtobufMessage
         self::LINKS => array(
             'name' => 'links',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbLink'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbLink'
         ),
         self::LAST_MOD => array(
             'name' => 'last_mod',
@@ -69,12 +69,12 @@ class RpbContent extends \ProtobufMessage
         self::USERMETA => array(
             'name' => 'usermeta',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbPair'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbPair'
         ),
         self::INDEXES => array(
             'name' => 'indexes',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbPair'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbPair'
         ),
         self::DELETED => array(
             'name' => 'deleted',
@@ -236,11 +236,11 @@ class RpbContent extends \ProtobufMessage
     /**
      * Appends value to 'links' list
      *
-     * @param \Riak\Api\Pb\Messages\RpbLink $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\RpbLink $value Value to append
      *
      * @return null
      */
-    public function appendLinks(\Riak\Api\Pb\Messages\RpbLink $value)
+    public function appendLinks(\Basho\Riak\Api\Pb\Message\RpbLink $value)
     {
         return $this->append(self::LINKS, $value);
     }
@@ -258,7 +258,7 @@ class RpbContent extends \ProtobufMessage
     /**
      * Returns 'links' list
      *
-     * @return \Riak\Api\Pb\Messages\RpbLink[]
+     * @return \Basho\Riak\Api\Pb\Message\RpbLink[]
      */
     public function getLinks()
     {
@@ -280,7 +280,7 @@ class RpbContent extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\RpbLink
+     * @return \Basho\Riak\Api\Pb\Message\RpbLink
      */
     public function getLinksAt($offset)
     {
@@ -344,11 +344,11 @@ class RpbContent extends \ProtobufMessage
     /**
      * Appends value to 'usermeta' list
      *
-     * @param \Riak\Api\Pb\Messages\RpbPair $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\RpbPair $value Value to append
      *
      * @return null
      */
-    public function appendUsermeta(\Riak\Api\Pb\Messages\RpbPair $value)
+    public function appendUsermeta(\Basho\Riak\Api\Pb\Message\RpbPair $value)
     {
         return $this->append(self::USERMETA, $value);
     }
@@ -366,7 +366,7 @@ class RpbContent extends \ProtobufMessage
     /**
      * Returns 'usermeta' list
      *
-     * @return \Riak\Api\Pb\Messages\RpbPair[]
+     * @return \Basho\Riak\Api\Pb\Message\RpbPair[]
      */
     public function getUsermeta()
     {
@@ -388,7 +388,7 @@ class RpbContent extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\RpbPair
+     * @return \Basho\Riak\Api\Pb\Message\RpbPair
      */
     public function getUsermetaAt($offset)
     {
@@ -408,11 +408,11 @@ class RpbContent extends \ProtobufMessage
     /**
      * Appends value to 'indexes' list
      *
-     * @param \Riak\Api\Pb\Messages\RpbPair $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\RpbPair $value Value to append
      *
      * @return null
      */
-    public function appendIndexes(\Riak\Api\Pb\Messages\RpbPair $value)
+    public function appendIndexes(\Basho\Riak\Api\Pb\Message\RpbPair $value)
     {
         return $this->append(self::INDEXES, $value);
     }
@@ -430,7 +430,7 @@ class RpbContent extends \ProtobufMessage
     /**
      * Returns 'indexes' list
      *
-     * @return \Riak\Api\Pb\Messages\RpbPair[]
+     * @return \Basho\Riak\Api\Pb\Message\RpbPair[]
      */
     public function getIndexes()
     {
@@ -452,7 +452,7 @@ class RpbContent extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\RpbPair
+     * @return \Basho\Riak\Api\Pb\Message\RpbPair
      */
     public function getIndexesAt($offset)
     {

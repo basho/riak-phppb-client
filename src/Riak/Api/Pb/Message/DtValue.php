@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * DtValue message
  */
@@ -31,7 +31,7 @@ class DtValue extends \ProtobufMessage
         self::MAP_VALUE => array(
             'name' => 'map_value',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\MapEntry'
+            'type' => '\Basho\Riak\Api\Pb\Message\MapEntry'
         ),
     );
 
@@ -156,11 +156,11 @@ class DtValue extends \ProtobufMessage
     /**
      * Appends value to 'map_value' list
      *
-     * @param \Riak\Api\Pb\Messages\MapEntry $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\MapEntry $value Value to append
      *
      * @return null
      */
-    public function appendMapValue(\Riak\Api\Pb\Messages\MapEntry $value)
+    public function appendMapValue(\Basho\Riak\Api\Pb\Message\MapEntry $value)
     {
         return $this->append(self::MAP_VALUE, $value);
     }
@@ -178,7 +178,7 @@ class DtValue extends \ProtobufMessage
     /**
      * Returns 'map_value' list
      *
-     * @return \Riak\Api\Pb\Messages\MapEntry[]
+     * @return \Basho\Riak\Api\Pb\Message\MapEntry[]
      */
     public function getMapValue()
     {
@@ -200,7 +200,7 @@ class DtValue extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\MapEntry
+     * @return \Basho\Riak\Api\Pb\Message\MapEntry
      */
     public function getMapValueAt($offset)
     {

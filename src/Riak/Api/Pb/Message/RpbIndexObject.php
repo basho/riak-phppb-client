@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbIndexObject message
  */
@@ -25,7 +25,7 @@ class RpbIndexObject extends \ProtobufMessage
         self::OBJECT => array(
             'name' => 'object',
             'required' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbGetResp'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbGetResp'
         ),
     );
 
@@ -85,11 +85,11 @@ class RpbIndexObject extends \ProtobufMessage
     /**
      * Sets value of 'object' property
      *
-     * @param \Riak\Api\Pb\Messages\RpbGetResp $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\RpbGetResp $value Property value
      *
      * @return null
      */
-    public function setObject(\Riak\Api\Pb\Messages\RpbGetResp $value)
+    public function setObject(\Basho\Riak\Api\Pb\Message\RpbGetResp $value)
     {
         return $this->set(self::OBJECT, $value);
     }
@@ -97,7 +97,7 @@ class RpbIndexObject extends \ProtobufMessage
     /**
      * Returns value of 'object' property
      *
-     * @return \Riak\Api\Pb\Messages\RpbGetResp
+     * @return \Basho\Riak\Api\Pb\Message\RpbGetResp
      */
     public function getObject()
     {

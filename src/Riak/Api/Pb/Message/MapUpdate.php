@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * MapUpdate message
  */
@@ -24,17 +24,17 @@ class MapUpdate extends \ProtobufMessage
         self::FIELD => array(
             'name' => 'field',
             'required' => true,
-            'type' => '\Riak\Api\Pb\Messages\MapField'
+            'type' => '\Basho\Riak\Api\Pb\Message\MapField'
         ),
         self::COUNTER_OP => array(
             'name' => 'counter_op',
             'required' => false,
-            'type' => '\Riak\Api\Pb\Messages\CounterOp'
+            'type' => '\Basho\Riak\Api\Pb\Message\CounterOp'
         ),
         self::SET_OP => array(
             'name' => 'set_op',
             'required' => false,
-            'type' => '\Riak\Api\Pb\Messages\SetOp'
+            'type' => '\Basho\Riak\Api\Pb\Message\SetOp'
         ),
         self::REGISTER_OP => array(
             'name' => 'register_op',
@@ -49,7 +49,7 @@ class MapUpdate extends \ProtobufMessage
         self::MAP_OP => array(
             'name' => 'map_op',
             'required' => false,
-            'type' => '\Riak\Api\Pb\Messages\MapOp'
+            'type' => '\Basho\Riak\Api\Pb\Message\MapOp'
         ),
     );
 
@@ -91,11 +91,11 @@ class MapUpdate extends \ProtobufMessage
     /**
      * Sets value of 'field' property
      *
-     * @param \Riak\Api\Pb\Messages\MapField $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\MapField $value Property value
      *
      * @return null
      */
-    public function setField(\Riak\Api\Pb\Messages\MapField $value)
+    public function setField(\Basho\Riak\Api\Pb\Message\MapField $value)
     {
         return $this->set(self::FIELD, $value);
     }
@@ -103,7 +103,7 @@ class MapUpdate extends \ProtobufMessage
     /**
      * Returns value of 'field' property
      *
-     * @return \Riak\Api\Pb\Messages\MapField
+     * @return \Basho\Riak\Api\Pb\Message\MapField
      */
     public function getField()
     {
@@ -113,11 +113,11 @@ class MapUpdate extends \ProtobufMessage
     /**
      * Sets value of 'counter_op' property
      *
-     * @param \Riak\Api\Pb\Messages\CounterOp $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\CounterOp $value Property value
      *
      * @return null
      */
-    public function setCounterOp(\Riak\Api\Pb\Messages\CounterOp $value)
+    public function setCounterOp(\Basho\Riak\Api\Pb\Message\CounterOp $value)
     {
         return $this->set(self::COUNTER_OP, $value);
     }
@@ -125,7 +125,7 @@ class MapUpdate extends \ProtobufMessage
     /**
      * Returns value of 'counter_op' property
      *
-     * @return \Riak\Api\Pb\Messages\CounterOp
+     * @return \Basho\Riak\Api\Pb\Message\CounterOp
      */
     public function getCounterOp()
     {
@@ -135,11 +135,11 @@ class MapUpdate extends \ProtobufMessage
     /**
      * Sets value of 'set_op' property
      *
-     * @param \Riak\Api\Pb\Messages\SetOp $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\SetOp $value Property value
      *
      * @return null
      */
-    public function setSetOp(\Riak\Api\Pb\Messages\SetOp $value)
+    public function setSetOp(\Basho\Riak\Api\Pb\Message\SetOp $value)
     {
         return $this->set(self::SET_OP, $value);
     }
@@ -147,7 +147,7 @@ class MapUpdate extends \ProtobufMessage
     /**
      * Returns value of 'set_op' property
      *
-     * @return \Riak\Api\Pb\Messages\SetOp
+     * @return \Basho\Riak\Api\Pb\Message\SetOp
      */
     public function getSetOp()
     {
@@ -201,11 +201,11 @@ class MapUpdate extends \ProtobufMessage
     /**
      * Sets value of 'map_op' property
      *
-     * @param \Riak\Api\Pb\Messages\MapOp $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\MapOp $value Property value
      *
      * @return null
      */
-    public function setMapOp(\Riak\Api\Pb\Messages\MapOp $value)
+    public function setMapOp(\Basho\Riak\Api\Pb\Message\MapOp $value)
     {
         return $this->set(self::MAP_OP, $value);
     }
@@ -213,7 +213,7 @@ class MapUpdate extends \ProtobufMessage
     /**
      * Returns value of 'map_op' property
      *
-     * @return \Riak\Api\Pb\Messages\MapOp
+     * @return \Basho\Riak\Api\Pb\Message\MapOp
      */
     public function getMapOp()
     {

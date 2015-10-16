@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbYokozunaSchemaPutReq message
  */
@@ -19,7 +19,7 @@ class RpbYokozunaSchemaPutReq extends \ProtobufMessage
         self::SCHEMA => array(
             'name' => 'schema',
             'required' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbYokozunaSchema'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbYokozunaSchema'
         ),
     );
 
@@ -56,11 +56,11 @@ class RpbYokozunaSchemaPutReq extends \ProtobufMessage
     /**
      * Sets value of 'schema' property
      *
-     * @param \Riak\Api\Pb\Messages\RpbYokozunaSchema $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\RpbYokozunaSchema $value Property value
      *
      * @return null
      */
-    public function setSchema(\Riak\Api\Pb\Messages\RpbYokozunaSchema $value)
+    public function setSchema(\Basho\Riak\Api\Pb\Message\RpbYokozunaSchema $value)
     {
         return $this->set(self::SCHEMA, $value);
     }
@@ -68,7 +68,7 @@ class RpbYokozunaSchemaPutReq extends \ProtobufMessage
     /**
      * Returns value of 'schema' property
      *
-     * @return \Riak\Api\Pb\Messages\RpbYokozunaSchema
+     * @return \Basho\Riak\Api\Pb\Message\RpbYokozunaSchema
      */
     public function getSchema()
     {

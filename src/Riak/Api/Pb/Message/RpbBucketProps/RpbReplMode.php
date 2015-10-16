@@ -4,7 +4,7 @@
  *
  * riak.api.pb.messages package
  */
-namespace Riak\Api\Pb\Messages\RpbBucketProps {
+namespace Basho\Riak\Api\Pb\Message\RpbBucketProps {
 /**
  * RpbReplMode enum embedded in RpbBucketProps message
  */

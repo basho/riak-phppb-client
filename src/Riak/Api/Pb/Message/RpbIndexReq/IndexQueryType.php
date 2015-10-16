@@ -4,7 +4,7 @@
  *
  * riak.api.pb.messages package
  */
-namespace Riak\Api\Pb\Messages\RpbIndexReq {
+namespace Basho\Riak\Api\Pb\Message\RpbIndexReq {
 /**
  * IndexQueryType enum embedded in RpbIndexReq message
  */

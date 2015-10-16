@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbCommitHook message
  */
@@ -20,7 +20,7 @@ class RpbCommitHook extends \ProtobufMessage
         self::MODFUN => array(
             'name' => 'modfun',
             'required' => false,
-            'type' => '\Riak\Api\Pb\Messages\RpbModFun'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbModFun'
         ),
         self::NAME => array(
             'name' => 'name',
@@ -63,11 +63,11 @@ class RpbCommitHook extends \ProtobufMessage
     /**
      * Sets value of 'modfun' property
      *
-     * @param \Riak\Api\Pb\Messages\RpbModFun $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\RpbModFun $value Property value
      *
      * @return null
      */
-    public function setModfun(\Riak\Api\Pb\Messages\RpbModFun $value)
+    public function setModfun(\Basho\Riak\Api\Pb\Message\RpbModFun $value)
     {
         return $this->set(self::MODFUN, $value);
     }
@@ -75,7 +75,7 @@ class RpbCommitHook extends \ProtobufMessage
     /**
      * Returns value of 'modfun' property
      *
-     * @return \Riak\Api\Pb\Messages\RpbModFun
+     * @return \Basho\Riak\Api\Pb\Message\RpbModFun
      */
     public function getModfun()
     {

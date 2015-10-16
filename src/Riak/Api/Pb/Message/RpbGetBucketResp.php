@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbGetBucketResp message
  */
@@ -19,7 +19,7 @@ class RpbGetBucketResp extends \ProtobufMessage
         self::PROPS => array(
             'name' => 'props',
             'required' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbBucketProps'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbBucketProps'
         ),
     );
 
@@ -56,11 +56,11 @@ class RpbGetBucketResp extends \ProtobufMessage
     /**
      * Sets value of 'props' property
      *
-     * @param \Riak\Api\Pb\Messages\RpbBucketProps $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\RpbBucketProps $value Property value
      *
      * @return null
      */
-    public function setProps(\Riak\Api\Pb\Messages\RpbBucketProps $value)
+    public function setProps(\Basho\Riak\Api\Pb\Message\RpbBucketProps $value)
     {
         return $this->set(self::PROPS, $value);
     }
@@ -68,7 +68,7 @@ class RpbGetBucketResp extends \ProtobufMessage
     /**
      * Returns value of 'props' property
      *
-     * @return \Riak\Api\Pb\Messages\RpbBucketProps
+     * @return \Basho\Riak\Api\Pb\Message\RpbBucketProps
      */
     public function getProps()
     {

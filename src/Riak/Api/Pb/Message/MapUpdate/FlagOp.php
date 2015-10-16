@@ -4,7 +4,7 @@
  *
  * riak.api.pb.messages package
  */
-namespace Riak\Api\Pb\Messages\MapUpdate {
+namespace Basho\Riak\Api\Pb\Message\MapUpdate {
 /**
  * FlagOp enum embedded in MapUpdate message
  */

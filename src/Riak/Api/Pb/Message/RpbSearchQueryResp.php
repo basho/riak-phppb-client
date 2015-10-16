@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbSearchQueryResp message
  */
@@ -21,7 +21,7 @@ class RpbSearchQueryResp extends \ProtobufMessage
         self::DOCS => array(
             'name' => 'docs',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbSearchDoc'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbSearchDoc'
         ),
         self::MAX_SCORE => array(
             'name' => 'max_score',
@@ -70,11 +70,11 @@ class RpbSearchQueryResp extends \ProtobufMessage
     /**
      * Appends value to 'docs' list
      *
-     * @param \Riak\Api\Pb\Messages\RpbSearchDoc $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\RpbSearchDoc $value Value to append
      *
      * @return null
      */
-    public function appendDocs(\Riak\Api\Pb\Messages\RpbSearchDoc $value)
+    public function appendDocs(\Basho\Riak\Api\Pb\Message\RpbSearchDoc $value)
     {
         return $this->append(self::DOCS, $value);
     }
@@ -92,7 +92,7 @@ class RpbSearchQueryResp extends \ProtobufMessage
     /**
      * Returns 'docs' list
      *
-     * @return \Riak\Api\Pb\Messages\RpbSearchDoc[]
+     * @return \Basho\Riak\Api\Pb\Message\RpbSearchDoc[]
      */
     public function getDocs()
     {
@@ -114,7 +114,7 @@ class RpbSearchQueryResp extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\RpbSearchDoc
+     * @return \Basho\Riak\Api\Pb\Message\RpbSearchDoc
      */
     public function getDocsAt($offset)
     {

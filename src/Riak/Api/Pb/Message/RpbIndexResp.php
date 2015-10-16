@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbIndexResp message
  */
@@ -27,7 +27,7 @@ class RpbIndexResp extends \ProtobufMessage
         self::RESULTS => array(
             'name' => 'results',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbPair'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbPair'
         ),
         self::CONTINUATION => array(
             'name' => 'continuation',
@@ -141,11 +141,11 @@ class RpbIndexResp extends \ProtobufMessage
     /**
      * Appends value to 'results' list
      *
-     * @param \Riak\Api\Pb\Messages\RpbPair $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\RpbPair $value Value to append
      *
      * @return null
      */
-    public function appendResults(\Riak\Api\Pb\Messages\RpbPair $value)
+    public function appendResults(\Basho\Riak\Api\Pb\Message\RpbPair $value)
     {
         return $this->append(self::RESULTS, $value);
     }
@@ -163,7 +163,7 @@ class RpbIndexResp extends \ProtobufMessage
     /**
      * Returns 'results' list
      *
-     * @return \Riak\Api\Pb\Messages\RpbPair[]
+     * @return \Basho\Riak\Api\Pb\Message\RpbPair[]
      */
     public function getResults()
     {
@@ -185,7 +185,7 @@ class RpbIndexResp extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\RpbPair
+     * @return \Basho\Riak\Api\Pb\Message\RpbPair
      */
     public function getResultsAt($offset)
     {

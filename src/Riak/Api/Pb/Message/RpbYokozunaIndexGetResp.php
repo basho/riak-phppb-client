@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbYokozunaIndexGetResp message
  */
@@ -19,7 +19,7 @@ class RpbYokozunaIndexGetResp extends \ProtobufMessage
         self::INDEX => array(
             'name' => 'index',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbYokozunaIndex'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbYokozunaIndex'
         ),
     );
 
@@ -56,11 +56,11 @@ class RpbYokozunaIndexGetResp extends \ProtobufMessage
     /**
      * Appends value to 'index' list
      *
-     * @param \Riak\Api\Pb\Messages\RpbYokozunaIndex $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\RpbYokozunaIndex $value Value to append
      *
      * @return null
      */
-    public function appendIndex(\Riak\Api\Pb\Messages\RpbYokozunaIndex $value)
+    public function appendIndex(\Basho\Riak\Api\Pb\Message\RpbYokozunaIndex $value)
     {
         return $this->append(self::INDEX, $value);
     }
@@ -78,7 +78,7 @@ class RpbYokozunaIndexGetResp extends \ProtobufMessage
     /**
      * Returns 'index' list
      *
-     * @return \Riak\Api\Pb\Messages\RpbYokozunaIndex[]
+     * @return \Basho\Riak\Api\Pb\Message\RpbYokozunaIndex[]
      */
     public function getIndex()
     {
@@ -100,7 +100,7 @@ class RpbYokozunaIndexGetResp extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\RpbYokozunaIndex
+     * @return \Basho\Riak\Api\Pb\Message\RpbYokozunaIndex
      */
     public function getIndexAt($offset)
     {

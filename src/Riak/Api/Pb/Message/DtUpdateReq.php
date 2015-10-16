@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * DtUpdateReq message
  */
@@ -51,7 +51,7 @@ class DtUpdateReq extends \ProtobufMessage
         self::OP => array(
             'name' => 'op',
             'required' => true,
-            'type' => '\Riak\Api\Pb\Messages\DtOp'
+            'type' => '\Basho\Riak\Api\Pb\Message\DtOp'
         ),
         self::W => array(
             'name' => 'w',
@@ -230,11 +230,11 @@ class DtUpdateReq extends \ProtobufMessage
     /**
      * Sets value of 'op' property
      *
-     * @param \Riak\Api\Pb\Messages\DtOp $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\DtOp $value Property value
      *
      * @return null
      */
-    public function setOp(\Riak\Api\Pb\Messages\DtOp $value)
+    public function setOp(\Basho\Riak\Api\Pb\Message\DtOp $value)
     {
         return $this->set(self::OP, $value);
     }
@@ -242,7 +242,7 @@ class DtUpdateReq extends \ProtobufMessage
     /**
      * Returns value of 'op' property
      *
-     * @return \Riak\Api\Pb\Messages\DtOp
+     * @return \Basho\Riak\Api\Pb\Message\DtOp
      */
     public function getOp()
     {

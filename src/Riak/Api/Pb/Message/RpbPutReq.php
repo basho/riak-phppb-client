@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbPutReq message
  */
@@ -49,7 +49,7 @@ class RpbPutReq extends \ProtobufMessage
         self::CONTENT => array(
             'name' => 'content',
             'required' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbContent'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbContent'
         ),
         self::W => array(
             'name' => 'w',
@@ -227,11 +227,11 @@ class RpbPutReq extends \ProtobufMessage
     /**
      * Sets value of 'content' property
      *
-     * @param \Riak\Api\Pb\Messages\RpbContent $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\RpbContent $value Property value
      *
      * @return null
      */
-    public function setContent(\Riak\Api\Pb\Messages\RpbContent $value)
+    public function setContent(\Basho\Riak\Api\Pb\Message\RpbContent $value)
     {
         return $this->set(self::CONTENT, $value);
     }
@@ -239,7 +239,7 @@ class RpbPutReq extends \ProtobufMessage
     /**
      * Returns value of 'content' property
      *
-     * @return \Riak\Api\Pb\Messages\RpbContent
+     * @return \Basho\Riak\Api\Pb\Message\RpbContent
      */
     public function getContent()
     {

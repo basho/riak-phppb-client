@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * DtFetchResp message
  */
@@ -31,7 +31,7 @@ class DtFetchResp extends \ProtobufMessage
         self::VALUE => array(
             'name' => 'value',
             'required' => false,
-            'type' => '\Riak\Api\Pb\Messages\DtValue'
+            'type' => '\Basho\Riak\Api\Pb\Message\DtValue'
         ),
     );
 
@@ -114,11 +114,11 @@ class DtFetchResp extends \ProtobufMessage
     /**
      * Sets value of 'value' property
      *
-     * @param \Riak\Api\Pb\Messages\DtValue $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\DtValue $value Property value
      *
      * @return null
      */
-    public function setValue(\Riak\Api\Pb\Messages\DtValue $value)
+    public function setValue(\Basho\Riak\Api\Pb\Message\DtValue $value)
     {
         return $this->set(self::VALUE, $value);
     }
@@ -126,7 +126,7 @@ class DtFetchResp extends \ProtobufMessage
     /**
      * Returns value of 'value' property
      *
-     * @return \Riak\Api\Pb\Messages\DtValue
+     * @return \Basho\Riak\Api\Pb\Message\DtValue
      */
     public function getValue()
     {

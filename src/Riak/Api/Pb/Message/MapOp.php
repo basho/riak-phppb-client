@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * MapOp message
  */
@@ -20,12 +20,12 @@ class MapOp extends \ProtobufMessage
         self::REMOVES => array(
             'name' => 'removes',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\MapField'
+            'type' => '\Basho\Riak\Api\Pb\Message\MapField'
         ),
         self::UPDATES => array(
             'name' => 'updates',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\MapUpdate'
+            'type' => '\Basho\Riak\Api\Pb\Message\MapUpdate'
         ),
     );
 
@@ -63,11 +63,11 @@ class MapOp extends \ProtobufMessage
     /**
      * Appends value to 'removes' list
      *
-     * @param \Riak\Api\Pb\Messages\MapField $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\MapField $value Value to append
      *
      * @return null
      */
-    public function appendRemoves(\Riak\Api\Pb\Messages\MapField $value)
+    public function appendRemoves(\Basho\Riak\Api\Pb\Message\MapField $value)
     {
         return $this->append(self::REMOVES, $value);
     }
@@ -85,7 +85,7 @@ class MapOp extends \ProtobufMessage
     /**
      * Returns 'removes' list
      *
-     * @return \Riak\Api\Pb\Messages\MapField[]
+     * @return \Basho\Riak\Api\Pb\Message\MapField[]
      */
     public function getRemoves()
     {
@@ -107,7 +107,7 @@ class MapOp extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\MapField
+     * @return \Basho\Riak\Api\Pb\Message\MapField
      */
     public function getRemovesAt($offset)
     {
@@ -127,11 +127,11 @@ class MapOp extends \ProtobufMessage
     /**
      * Appends value to 'updates' list
      *
-     * @param \Riak\Api\Pb\Messages\MapUpdate $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\MapUpdate $value Value to append
      *
      * @return null
      */
-    public function appendUpdates(\Riak\Api\Pb\Messages\MapUpdate $value)
+    public function appendUpdates(\Basho\Riak\Api\Pb\Message\MapUpdate $value)
     {
         return $this->append(self::UPDATES, $value);
     }
@@ -149,7 +149,7 @@ class MapOp extends \ProtobufMessage
     /**
      * Returns 'updates' list
      *
-     * @return \Riak\Api\Pb\Messages\MapUpdate[]
+     * @return \Basho\Riak\Api\Pb\Message\MapUpdate[]
      */
     public function getUpdates()
     {
@@ -171,7 +171,7 @@ class MapOp extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\MapUpdate
+     * @return \Basho\Riak\Api\Pb\Message\MapUpdate
      */
     public function getUpdatesAt($offset)
     {

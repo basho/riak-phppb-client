@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbYokozunaIndexPutReq message
  */
@@ -19,7 +19,7 @@ class RpbYokozunaIndexPutReq extends \ProtobufMessage
         self::INDEX => array(
             'name' => 'index',
             'required' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbYokozunaIndex'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbYokozunaIndex'
         ),
     );
 
@@ -56,11 +56,11 @@ class RpbYokozunaIndexPutReq extends \ProtobufMessage
     /**
      * Sets value of 'index' property
      *
-     * @param \Riak\Api\Pb\Messages\RpbYokozunaIndex $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\RpbYokozunaIndex $value Property value
      *
      * @return null
      */
-    public function setIndex(\Riak\Api\Pb\Messages\RpbYokozunaIndex $value)
+    public function setIndex(\Basho\Riak\Api\Pb\Message\RpbYokozunaIndex $value)
     {
         return $this->set(self::INDEX, $value);
     }
@@ -68,7 +68,7 @@ class RpbYokozunaIndexPutReq extends \ProtobufMessage
     /**
      * Returns value of 'index' property
      *
-     * @return \Riak\Api\Pb\Messages\RpbYokozunaIndex
+     * @return \Basho\Riak\Api\Pb\Message\RpbYokozunaIndex
      */
     public function getIndex()
     {

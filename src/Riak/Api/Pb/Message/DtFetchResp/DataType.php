@@ -4,7 +4,7 @@
  *
  * riak.api.pb.messages package
  */
-namespace Riak\Api\Pb\Messages\DtFetchResp {
+namespace Basho\Riak\Api\Pb\Message\DtFetchResp {
 /**
  * DataType enum embedded in DtFetchResp message
  */

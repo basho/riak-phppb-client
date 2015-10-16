@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * MapEntry message
  */
@@ -24,7 +24,7 @@ class MapEntry extends \ProtobufMessage
         self::FIELD => array(
             'name' => 'field',
             'required' => true,
-            'type' => '\Riak\Api\Pb\Messages\MapField'
+            'type' => '\Basho\Riak\Api\Pb\Message\MapField'
         ),
         self::COUNTER_VALUE => array(
             'name' => 'counter_value',
@@ -49,7 +49,7 @@ class MapEntry extends \ProtobufMessage
         self::MAP_VALUE => array(
             'name' => 'map_value',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\MapEntry'
+            'type' => '\Basho\Riak\Api\Pb\Message\MapEntry'
         ),
     );
 
@@ -91,11 +91,11 @@ class MapEntry extends \ProtobufMessage
     /**
      * Sets value of 'field' property
      *
-     * @param \Riak\Api\Pb\Messages\MapField $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\MapField $value Property value
      *
      * @return null
      */
-    public function setField(\Riak\Api\Pb\Messages\MapField $value)
+    public function setField(\Basho\Riak\Api\Pb\Message\MapField $value)
     {
         return $this->set(self::FIELD, $value);
     }
@@ -103,7 +103,7 @@ class MapEntry extends \ProtobufMessage
     /**
      * Returns value of 'field' property
      *
-     * @return \Riak\Api\Pb\Messages\MapField
+     * @return \Basho\Riak\Api\Pb\Message\MapField
      */
     public function getField()
     {
@@ -243,11 +243,11 @@ class MapEntry extends \ProtobufMessage
     /**
      * Appends value to 'map_value' list
      *
-     * @param \Riak\Api\Pb\Messages\MapEntry $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\MapEntry $value Value to append
      *
      * @return null
      */
-    public function appendMapValue(\Riak\Api\Pb\Messages\MapEntry $value)
+    public function appendMapValue(\Basho\Riak\Api\Pb\Message\MapEntry $value)
     {
         return $this->append(self::MAP_VALUE, $value);
     }
@@ -265,7 +265,7 @@ class MapEntry extends \ProtobufMessage
     /**
      * Returns 'map_value' list
      *
-     * @return \Riak\Api\Pb\Messages\MapEntry[]
+     * @return \Basho\Riak\Api\Pb\Message\MapEntry[]
      */
     public function getMapValue()
     {
@@ -287,7 +287,7 @@ class MapEntry extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\MapEntry
+     * @return \Basho\Riak\Api\Pb\Message\MapEntry
      */
     public function getMapValueAt($offset)
     {

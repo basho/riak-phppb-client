@@ -4,7 +4,7 @@
  *
  * riak.api.pb.messages package
  */
-namespace Riak\Api\Pb\Messages\MapField {
+namespace Basho\Riak\Api\Pb\Message\MapField {
 /**
  * MapFieldType enum embedded in MapField message
  */

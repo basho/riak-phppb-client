@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * DtOp message
  */
@@ -21,17 +21,17 @@ class DtOp extends \ProtobufMessage
         self::COUNTER_OP => array(
             'name' => 'counter_op',
             'required' => false,
-            'type' => '\Riak\Api\Pb\Messages\CounterOp'
+            'type' => '\Basho\Riak\Api\Pb\Message\CounterOp'
         ),
         self::SET_OP => array(
             'name' => 'set_op',
             'required' => false,
-            'type' => '\Riak\Api\Pb\Messages\SetOp'
+            'type' => '\Basho\Riak\Api\Pb\Message\SetOp'
         ),
         self::MAP_OP => array(
             'name' => 'map_op',
             'required' => false,
-            'type' => '\Riak\Api\Pb\Messages\MapOp'
+            'type' => '\Basho\Riak\Api\Pb\Message\MapOp'
         ),
     );
 
@@ -70,11 +70,11 @@ class DtOp extends \ProtobufMessage
     /**
      * Sets value of 'counter_op' property
      *
-     * @param \Riak\Api\Pb\Messages\CounterOp $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\CounterOp $value Property value
      *
      * @return null
      */
-    public function setCounterOp(\Riak\Api\Pb\Messages\CounterOp $value)
+    public function setCounterOp(\Basho\Riak\Api\Pb\Message\CounterOp $value)
     {
         return $this->set(self::COUNTER_OP, $value);
     }
@@ -82,7 +82,7 @@ class DtOp extends \ProtobufMessage
     /**
      * Returns value of 'counter_op' property
      *
-     * @return \Riak\Api\Pb\Messages\CounterOp
+     * @return \Basho\Riak\Api\Pb\Message\CounterOp
      */
     public function getCounterOp()
     {
@@ -92,11 +92,11 @@ class DtOp extends \ProtobufMessage
     /**
      * Sets value of 'set_op' property
      *
-     * @param \Riak\Api\Pb\Messages\SetOp $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\SetOp $value Property value
      *
      * @return null
      */
-    public function setSetOp(\Riak\Api\Pb\Messages\SetOp $value)
+    public function setSetOp(\Basho\Riak\Api\Pb\Message\SetOp $value)
     {
         return $this->set(self::SET_OP, $value);
     }
@@ -104,7 +104,7 @@ class DtOp extends \ProtobufMessage
     /**
      * Returns value of 'set_op' property
      *
-     * @return \Riak\Api\Pb\Messages\SetOp
+     * @return \Basho\Riak\Api\Pb\Message\SetOp
      */
     public function getSetOp()
     {
@@ -114,11 +114,11 @@ class DtOp extends \ProtobufMessage
     /**
      * Sets value of 'map_op' property
      *
-     * @param \Riak\Api\Pb\Messages\MapOp $value Property value
+     * @param \Basho\Riak\Api\Pb\Message\MapOp $value Property value
      *
      * @return null
      */
-    public function setMapOp(\Riak\Api\Pb\Messages\MapOp $value)
+    public function setMapOp(\Basho\Riak\Api\Pb\Message\MapOp $value)
     {
         return $this->set(self::MAP_OP, $value);
     }
@@ -126,7 +126,7 @@ class DtOp extends \ProtobufMessage
     /**
      * Returns value of 'map_op' property
      *
-     * @return \Riak\Api\Pb\Messages\MapOp
+     * @return \Basho\Riak\Api\Pb\Message\MapOp
      */
     public function getMapOp()
     {

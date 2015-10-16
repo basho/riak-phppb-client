@@ -5,7 +5,7 @@
  * riak.api.pb.messages package
  */
 
-namespace Riak\Api\Pb\Messages {
+namespace Basho\Riak\Api\Pb\Message {
 /**
  * RpbCSBucketResp message
  */
@@ -21,7 +21,7 @@ class RpbCSBucketResp extends \ProtobufMessage
         self::OBJECTS => array(
             'name' => 'objects',
             'repeated' => true,
-            'type' => '\Riak\Api\Pb\Messages\RpbIndexObject'
+            'type' => '\Basho\Riak\Api\Pb\Message\RpbIndexObject'
         ),
         self::CONTINUATION => array(
             'name' => 'continuation',
@@ -70,11 +70,11 @@ class RpbCSBucketResp extends \ProtobufMessage
     /**
      * Appends value to 'objects' list
      *
-     * @param \Riak\Api\Pb\Messages\RpbIndexObject $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\RpbIndexObject $value Value to append
      *
      * @return null
      */
-    public function appendObjects(\Riak\Api\Pb\Messages\RpbIndexObject $value)
+    public function appendObjects(\Basho\Riak\Api\Pb\Message\RpbIndexObject $value)
     {
         return $this->append(self::OBJECTS, $value);
     }
@@ -92,7 +92,7 @@ class RpbCSBucketResp extends \ProtobufMessage
     /**
      * Returns 'objects' list
      *
-     * @return \Riak\Api\Pb\Messages\RpbIndexObject[]
+     * @return \Basho\Riak\Api\Pb\Message\RpbIndexObject[]
      */
     public function getObjects()
     {
@@ -114,7 +114,7 @@ class RpbCSBucketResp extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Riak\Api\Pb\Messages\RpbIndexObject
+     * @return \Basho\Riak\Api\Pb\Message\RpbIndexObject
      */
     public function getObjectsAt($offset)
     {
