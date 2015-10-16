@@ -29,7 +29,7 @@
     "psr-4": {"Basho\\": "src/"}
   },
   "autoload-dev": {
-    "psr-4": {"Basho\\Tests\\": "tests/"}
+    "psr-4": {"Basho\\Tests\\": "vendor/basho/riak/tests/"}
   },
   "support": {
     "issues": "https://github.com/basho/riak-phppb-client/issues"
@@ -52,13 +52,12 @@
     }
   ],
   "require": {
-    "basho/riak": "2.*",
+    "basho/riak": "3.0.x-dev",
     "php": ">=5.4",
     "ext-json": "*",
     "ext-curl": "*"
   },
   "require-dev": {
-    "basho/riak": "dev-pb_support",
     "basho/riak_pb": "2.0",
     "phpunit/phpunit": "4.5.*",
     "apigen/apigen": "4.1.*",
