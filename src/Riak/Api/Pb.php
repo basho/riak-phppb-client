@@ -112,6 +112,7 @@ class Pb extends Api implements ApiInterface
                 break;
             case 'Basho\Riak\Command\Object\Fetch':
                 $this->messageCode = Api\Pb\Message\Codes::RpbGetReq;
+                $message = new Api\Pb\Message\RpbGetReq();
                 break;
             case 'Basho\Riak\Command\Object\Store':
                 $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
@@ -164,6 +165,7 @@ class Pb extends Api implements ApiInterface
                 throw new Api\Exception('Not implemented at this time.');
                 break;
             case 'Basho\Riak\Command\Ping':
+                $this->messageCode = Api\Pb\Message\Codes::RpbPingReq;
                 $message = '';
                 break;
             default:
@@ -233,56 +235,66 @@ class Pb extends Api implements ApiInterface
 
     public function send()
     {
-        $response = '';
+        $message = '';
 
-        $written = fwrite($this->connection, $this->requestMessage->serializeToString());
+        if (method_exists($this->requestMessage, "serializeToString")) {
+            $message = $this->requestMessage->serializeToString();
+        }
+
+        $packedMessage = $this->packMessage($this->messageCode, $message);
+
+        $written = fwrite($this->connection, $packedMessage);
         if (!$written) {
             throw new Api\Exception('Failed to write to socket.');
         }
 
-        // receive data - in small chunks :)
-        while (!feof($this->connection))
-        {
-            $response .= fgets($this->connection, 128);
-            if (!$response) {
-                break;
-            }
-        }
+        // read response message length
+        $array = unpack("N", stream_get_contents($this->connection, 4));
+        $length = $array[1];
 
-        if (!$response) {
-            throw new Api\Exception('Empty response from socket.');
-        }
+        // read response message code
+        $array = unpack("C", stream_get_contents($this->connection, 1));
+        $code = $array[1];
 
-        $this->parseResponse($response);
+        // read response message
+        $message = stream_get_contents($this->connection, $length - 1);
+
+        $this->parseResponse($code, $message);
 
         return $this->success;
     }
 
     /**
-     * @param string $response
-     * @throws Api\Exception
+     * @param $code
+     * @param string $message
+     * @throws Exception
+     * @internal param string $response
      */
-    protected function parseResponse($response = '')
+    protected function parseResponse($code, $message = '')
     {
-        switch (substr($response, 0, 1)) {
-            case '0':
-                $message = new Api\Pb\Message\RpbErrorResp();
-                $message->parseFromString($response);
+        $this->success = true;
+        switch ($code) {
+            case Api\Pb\Message\Codes::RpbErrorResp:
+                $pbResponse = new Api\Pb\Message\RpbErrorResp();
+                $pbResponse->parseFromString($message);
                 $this->success = false;
-                $this->error = $message->getErrmsg();
-                $this->response = new Command\Response($this->success, $message->getErrcode(), $this->error);
+                $this->error = $pbResponse->getErrmsg();
+                $this->response = new Command\Response($this->success, $pbResponse->getErrcode(), $this->error);
                 break;
-            case '12':
+            case Api\Pb\Message\Codes::RpbPingResp:
+                $this->response = new Command\Response($this->success, 200, '');
+                break;
+            case Api\Pb\Message\Codes::RpbPutResp:
                 $location = null;
-                $message = new Api\Pb\Message\RpbPutResp();
-                $message->parseFromString($response);
+                $pbResponse = new Api\Pb\Message\RpbPutResp();
+                $pbResponse->parseFromString($message);
 
-                if ($message->getKey()) {
-                    $location = new Location($message->getKey(), $this->getCommand()->getBucket());
+                if ($pbResponse->getKey()) {
+                    $location = new Location($pbResponse->getKey(), $this->getCommand()->getBucket());
                 }
 
                 $objects = [];
-                foreach ($message->getContent() as $content) {
+                foreach ($pbResponse->getContent() as $content) {
                     /** @var Command\Object $command */
                     $command = $this->command;
 
@@ -290,7 +302,32 @@ class Pb extends Api implements ApiInterface
                         ->setData($command->getDecodedData($content->getValue(), $content->getContentType()))
                         ->setContentType($content->getContentType())
                         ->setContentEncoding($content->getContentEncoding())
-                        ->setVclock($message->getVclock());
+                        ->setVclock($pbResponse->getVclock());
+
+                    // TODO: add index values
+
+                    // TODO: add user meta data
+
+                    $objects[] = $object;
+                }
+
+                $this->response = new Command\Object\Response($this->success, 200, '', $location, $objects);
+                break;
+            case Api\Pb\Message\Codes::RpbGetResp:
+                $location = null;
+                $pbResponse = new Api\Pb\Message\RpbGetResp();
+                $pbResponse->parseFromString($message);
+
+                $objects = [];
+                foreach ($pbResponse->getContent() as $content) {
+                    /** @var Command\Object $command */
+                    $command = $this->command;
+
+                    $object = (new Object)
+                        ->setData($command->getDecodedData($content->getValue(), $content->getContentType()))
+                        ->setContentType($content->getContentType())
+                        ->setContentEncoding($content->getContentEncoding())
+                        ->setVclock($pbResponse->getVclock());
 
                     // TODO: add index values
 
