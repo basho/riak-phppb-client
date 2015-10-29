@@ -20,6 +20,7 @@ namespace Basho\Riak\Api;
 use Basho\Riak\Api;
 use Basho\Riak\ApiInterface;
 use Basho\Riak\Command;
+use Basho\Riak\DataType;
 use Basho\Riak\Location;
 use Basho\Riak\Node;
 use Basho\Riak\Object;
@@ -128,22 +129,24 @@ class Pb extends Api implements ApiInterface
                 $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
                 break;
             case 'Basho\Riak\Command\DataType\Counter\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::DtFetchReq;
                 break;
             case 'Basho\Riak\Command\DataType\Counter\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $message = $this->buildCounterUpdateMessage($this->command->getData()['increment']);
                 break;
             case 'Basho\Riak\Command\DataType\Set\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::DtFetchReq;
                 break;
             case 'Basho\Riak\Command\DataType\Set\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $data = $this->command->getData();
+                $message = $this->buildSetUpdateMessage($data['add_all'], $data['remove_all']);
                 break;
             case 'Basho\Riak\Command\DataType\Map\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::DtFetchReq;
                 break;
             case 'Basho\Riak\Command\DataType\Map\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $data = $this->command->getData();
+                $message = $this->buildMapUpdateMessage($data['update'], $data['remove']);
                 break;
             case 'Basho\Riak\Command\Search\Index\Fetch':
                 $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaIndexGetReq;
@@ -177,15 +180,9 @@ class Pb extends Api implements ApiInterface
                 throw new Api\Exception('Command is invalid.');
         }
 
-        $location = $this->command->getLocation();
-        if (!empty($location) && $location instanceof Location) {
-            $message->setKey($location->getKey());
-            $message->setBucket($location->getBucket()->getName());
-            $message->setType($location->getBucket()->getType());
-        } elseif ($this->command->getBucket()) {
-            $message->setBucket($this->command->getBucket()->getName());
-            $message->setType($this->command->getBucket()->getType());
-        }
+        $this->setLocationOnMessage($message, $this->command->getLocation());
+        $this->setBucketOnMessage($message, $this->command->getBucket());
+        $this->setOptionsOnMessage($message, $this->command);
 
         $this->requestMessage = $message;
 
@@ -359,5 +356,107 @@ class Pb extends Api implements ApiInterface
         }
 
         return $this;
+    }
+
+    protected function buildDataTypeMessage()
+    {
+        $this->messageCode = Api\Pb\Message\Codes::DtUpdateReq;
+        return new Api\Pb\Message\DtUpdateReq();
+    }
+
+    protected function buildCounterUpdateMessage($increment)
+    {
+        $message = $this->buildDataTypeMessage();
+        $message->setOp($this->buildCounterOp($increment));
+    }
+
+    protected function buildSetUpdateMessage(array $adds = [], array $removes = [])
+    {
+        $message = $this->buildDataTypeMessage();
+        $message->setOp($this->buildSetOp($adds, $removes));
+    }
+
+    protected function buildMapUpdateMessage(array $updates = [], array $removes = [])
+    {
+
+        $message = $this->buildDataTypeMessage();
+        $message->setOp($op);
+    }
+
+    protected function buildCounterOp($increment)
+    {
+        $op = new Api\Pb\Message\CounterOp();
+        $op->setIncrement($increment);
+
+        return $op;
+    }
+
+    protected function buildSetOp(array $adds, array $removes)
+    {
+        $op = new Api\Pb\Message\SetOp();
+
+        foreach ($adds as $add) {
+            $op->appendAdds($add);
+        }
+
+        foreach ($removes as $remove) {
+            $op->appendRemoves($remove);
+        }
+
+        return $op;
+    }
+
+    protected function buildMapOp(array $updates, array $removes)
+    {
+        $op = new Api\Pb\Message\MapOp();
+
+        foreach ($updates as $key => $update) {
+            // [0] => key, [1] => type
+            $parts = explode('_', $key);
+            
+            $mapUpdate = new Api\Pb\Message\MapUpdate();
+
+            $op->appendUpdates($update);
+        }
+
+        foreach ($removes as $remove) {
+            $op->appendRemoves($remove);
+        }
+
+        return $op;
+    }
+
+    protected function parseMapKey($key)
+    {
+        $parts = explode('_', $key);
+        if ($parts[1] == DataType\Set::TYPE) {
+
+        } elseif ($parts[1] == DataType\Set::TYPE) {
+
+        } elseif ($parts[1] == DataType\Set::TYPE) {
+
+        } else {
+            throw new Exception("Invalid map key.");
+        }
+    }
+
+    protected function setLocationOnMessage(\ProtobufMessage &$message, Location $location = null)
+    {
+        if (!empty($location)) {
+            $message->setKey($location->getKey());
+        }
+    }
+
+    protected function setBucketOnMessage(\ProtobufMessage &$message, Bucket $bucket = null)
+    {
+        if (!empty($bucket)) {
+            $message->setBucket($bucket->getName());
+            $message->setType($bucket->getType());
+        }
+    }
+
+    protected function setOptionsOnMessage(\ProtobufMessage &$message, Command $command)
+    {
+        // TODO: RETURN_BODY, R, W, PR, PW, DW, N, etc
     }
 }
