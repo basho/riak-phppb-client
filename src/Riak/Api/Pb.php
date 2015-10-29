@@ -96,19 +96,24 @@ class Pb extends Api implements ApiInterface
 
         switch (get_class($this->command)) {
             case 'Basho\Riak\Command\Bucket\List':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbListBucketsReq;
+                $message = new Api\Pb\Message\RpbListBucketsReq();
                 break;
             case 'Basho\Riak\Command\Bucket\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbGetBucketReq;
+                $message = new Api\Pb\Message\RpbGetBucketReq();
                 break;
             case 'Basho\Riak\Command\Bucket\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbSetBucketReq;
+                $message = new Api\Pb\Message\RpbSetBucketReq();
                 break;
             case 'Basho\Riak\Command\Bucket\Delete':
                 $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $message = new Api\Pb\Message\RpbPutReq();
                 break;
             case 'Basho\Riak\Command\Bucket\Keys':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbListKeysReq;
+                $message = new Api\Pb\Message\RpbListKeysReq();
                 break;
             case 'Basho\Riak\Command\Object\Fetch':
                 $this->messageCode = Api\Pb\Message\Codes::RpbGetReq;
@@ -141,28 +146,28 @@ class Pb extends Api implements ApiInterface
                 $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
                 break;
             case 'Basho\Riak\Command\Search\Index\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaIndexGetReq;
                 break;
             case 'Basho\Riak\Command\Search\Index\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaIndexPutReq;
                 break;
             case 'Basho\Riak\Command\Search\Index\Delete':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaIndexDeleteReq;
                 break;
             case 'Basho\Riak\Command\Search\Schema\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaSchemaGetReq;
                 break;
             case 'Basho\Riak\Command\Search\Schema\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaSchemaPutReq;
                 break;
             case 'Basho\Riak\Command\Search\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbSearchQueryReq;
                 break;
             case 'Basho\Riak\Command\MapReduce\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message\Codes::RpbMapRedReq;
                 break;
             case 'Basho\Riak\Command\Indexes\Query':
-                throw new Api\Exception('Not implemented at this time.');
+                $this->messageCode = Api\Pb\Message\Codes::RpbMapRedReq;
                 break;
             case 'Basho\Riak\Command\Ping':
                 $this->messageCode = Api\Pb\Message\Codes::RpbPingReq;
