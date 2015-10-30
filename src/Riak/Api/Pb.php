@@ -19,6 +19,7 @@ namespace Basho\Riak\Api;
 
 use Basho\Riak\Api;
 use Basho\Riak\ApiInterface;
+use Basho\Riak\Bucket;
 use Basho\Riak\Command;
 use Basho\Riak\DataType;
 use Basho\Riak\Location;
@@ -124,7 +125,7 @@ class Pb extends Api implements ApiInterface
                 $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
                 $message = new Api\Pb\Message\RpbPutReq();
                 $message->setContent($this->prepareContent());
-               break;
+                break;
             case 'Basho\Riak\Command\Object\Delete':
                 $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
                 break;
@@ -189,6 +190,11 @@ class Pb extends Api implements ApiInterface
         return $this;
     }
 
+    /**
+     * @param $code
+     * @param string $payload
+     * @return string
+     */
     protected function packMessage($code, $payload = '')
     {
         // https://github.com/basho/riak_pb#protocol
@@ -235,6 +241,10 @@ class Pb extends Api implements ApiInterface
         return $pair;
     }
 
+    /**
+     * @return null
+     * @throws Exception
+     */
     public function send()
     {
         $message = '';
@@ -345,12 +355,16 @@ class Pb extends Api implements ApiInterface
         }
     }
 
+    /**
+     * @return $this
+     * @throws Exception
+     */
     public function openConnection()
     {
         $protocol = $this->node->useTls() ? 'tls' : 'tcp';
         $socket = sprintf('%s://%s', $protocol, $this->node->getUri());
 
-        $this->connection = stream_socket_client($socket, $errNo, $errMsg, 30, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT);
+        $this->connection = stream_socket_client($socket, $errNo, $errMsg, 30, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT);
         if ($errNo) {
             throw new Api\Exception($errNo . ' - ' . $errMsg);
         }
@@ -358,88 +372,153 @@ class Pb extends Api implements ApiInterface
         return $this;
     }
 
+    /**
+     * @return Pb\Message\DtUpdateReq
+     */
     protected function buildDataTypeMessage()
     {
         $this->messageCode = Api\Pb\Message\Codes::DtUpdateReq;
         return new Api\Pb\Message\DtUpdateReq();
     }
 
+    /**
+     * @param $increment
+     * @return Pb\Message\DtUpdateReq
+     */
     protected function buildCounterUpdateMessage($increment)
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp($this->buildCounterOp($increment));
+        $message->setOp($this->buildCounterOp($increment, true));
+
+        return $message;
     }
 
+    /**
+     * @param array $adds
+     * @param array $removes
+     * @return Pb\Message\DtUpdateReq
+     */
     protected function buildSetUpdateMessage(array $adds = [], array $removes = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp($this->buildSetOp($adds, $removes));
+        $message->setOp($this->buildSetOp($adds, $removes, true));
+
+        return $message;
     }
 
+    /**
+     * @param array $updates
+     * @param array $removes
+     * @return Pb\Message\DtUpdateReq
+     * @throws Exception
+     */
     protected function buildMapUpdateMessage(array $updates = [], array $removes = [])
     {
-
         $message = $this->buildDataTypeMessage();
-        $message->setOp($op);
+        $message->setOp($this->buildMapOp($updates, $removes, true));
+
+        return $message;
     }
 
-    protected function buildCounterOp($increment)
+    /**
+     * @param $increment
+     * @param bool|false $returnAsDt
+     * @return Pb\Message\CounterOp|Pb\Message\DtOp
+     */
+    protected function buildCounterOp($increment, $returnAsDt = false)
     {
-        $op = new Api\Pb\Message\CounterOp();
-        $op->setIncrement($increment);
+        $cop = new Api\Pb\Message\CounterOp();
+        $cop->setIncrement($increment);
 
-        return $op;
+        if ($returnAsDt) {
+            $op = new Api\Pb\Message\DtOp();
+            $op->setCounterOp($cop);
+
+            return $op;
+        }
+
+        return $cop;
     }
 
-    protected function buildSetOp(array $adds, array $removes)
+    /**
+     * @param array $adds
+     * @param array $removes
+     * @param bool|false $returnAsDt
+     * @return Pb\Message\DtOp|Pb\Message\SetOp
+     */
+    protected function buildSetOp(array $adds, array $removes, $returnAsDt = false)
     {
-        $op = new Api\Pb\Message\SetOp();
+        $sop = new Api\Pb\Message\SetOp();
 
         foreach ($adds as $add) {
-            $op->appendAdds($add);
+            $sop->appendAdds($add);
         }
 
         foreach ($removes as $remove) {
-            $op->appendRemoves($remove);
+            $sop->appendRemoves($remove);
         }
 
-        return $op;
+        if ($returnAsDt) {
+            $op = new Api\Pb\Message\DtOp();
+            $op->setSetOp($sop);
+
+            return $op;
+        }
+
+        return $sop;
     }
 
-    protected function buildMapOp(array $updates, array $removes)
+    /**
+     * @param array $updates
+     * @param array $removes
+     * @param bool|false $returnAsDt
+     * @return Pb\Message\DtOp|Pb\Message\MapOp
+     * @throws Exception
+     */
+    protected function buildMapOp(array $updates, array $removes, $returnAsDt = false)
     {
-        $op = new Api\Pb\Message\MapOp();
+        $mop = new Api\Pb\Message\MapOp();
 
         foreach ($updates as $key => $update) {
-            // [0] => key, [1] => type
-            $parts = explode('_', $key);
-            
             $mapUpdate = new Api\Pb\Message\MapUpdate();
 
-            $op->appendUpdates($update);
+            // [0] => key, [1] => type
+            $parts = explode('_', $key);
+            if ($parts[1] == DataType\Counter::TYPE) {
+                $mapUpdate->setCounterOp($this->buildCounterOp($update));
+            } elseif ($parts[1] == DataType\Set::TYPE) {
+                $mapUpdate->setSetOp($this->buildSetOp($update['add_all'], $update['remove_all']));
+            } elseif ($parts[1] == DataType\Map::TYPE) {
+                $mapUpdate->setMapOp($this->buildMapOp($update['update'], $update['remove']));
+            } elseif ($parts[1] == 'register') {
+                $mapUpdate->setRegisterOp($update);
+            } elseif ($parts[1] == 'flag') {
+                $mapUpdate->setFlagOp($update);
+            } else {
+                throw new Exception('Invalid map field type.');
+            }
+
+            $mop->appendUpdates($update);
         }
 
         foreach ($removes as $remove) {
-            $op->appendRemoves($remove);
+            $mop->appendRemoves($remove);
         }
 
-        return $op;
-    }
+        if ($returnAsDt) {
+            $op = new Api\Pb\Message\DtOp();
+            $op->setMapOp($mop);
 
-    protected function parseMapKey($key)
-    {
-        $parts = explode('_', $key);
-        if ($parts[1] == DataType\Set::TYPE) {
-
-        } elseif ($parts[1] == DataType\Set::TYPE) {
-
-        } elseif ($parts[1] == DataType\Set::TYPE) {
-
-        } else {
-            throw new Exception("Invalid map key.");
+            return $op;
         }
+
+        return $mop;
     }
 
+    /**
+     * @param Pb\Message\RpbGetReq|Pb\Message\RpbPutReq|\ProtobufMessage $message
+     * @param Location|null $location
+     */
     protected function setLocationOnMessage(\ProtobufMessage &$message, Location $location = null)
     {
         if (!empty($location)) {
@@ -447,6 +526,10 @@ class Pb extends Api implements ApiInterface
         }
     }
 
+    /**
+     * @param Pb\Message\RpbGetReq|Pb\Message\RpbPutReq|\ProtobufMessage $message
+     * @param Bucket|null $bucket
+     */
     protected function setBucketOnMessage(\ProtobufMessage &$message, Bucket $bucket = null)
     {
         if (!empty($bucket)) {
