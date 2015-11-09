@@ -350,6 +350,24 @@ class Pb extends Api implements ApiInterface
 
                 $this->response = new Command\Object\Response($this->success, 200, '', $location, $objects);
                 break;
+            case Api\Pb\Message\Codes::DtUpdateResp:
+                $location = null;
+                $pbResponse = new Api\Pb\Message\DtUpdateResp();
+                $pbResponse->parseFromString($message);
+
+                if ($pbResponse->getCounterValue() === null) {
+                    $counter = new DataType\Counter($pbResponse->getCounterValue());
+                    $this->response = new Command\DataType\Counter\Response($this->success, 200, '', $location, $counter);
+                } elseif ($pbResponse->getSetValue() === []) {
+                    $counter = new DataType\Set($pbResponse->getSetValue(), $pbResponse->getContext());
+                    $this->response = new Command\DataType\Set\Response($this->success, 200, '', $location, $counter);
+                } elseif ($pbResponse->getMapValue() === []) {
+                    $counter = new DataType\Map($pbResponse->getMapValue(), $pbResponse->getContext());
+                    $this->response = new Command\DataType\Map\Response($this->success, 200, '', $location, $counter);
+                } else {
+
+                }
+                break;
             default:
                 throw new Api\Exception('Mishandled PB response.');
         }
