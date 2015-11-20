@@ -359,11 +359,11 @@ class Pb extends Api implements ApiInterface
                     $counter = new DataType\Counter($pbResponse->getCounterValue());
                     $this->response = new Command\DataType\Counter\Response($this->success, 200, '', $location, $counter);
                 } elseif ($pbResponse->getSetValue() === []) {
-                    $counter = new DataType\Set($pbResponse->getSetValue(), $pbResponse->getContext());
-                    $this->response = new Command\DataType\Set\Response($this->success, 200, '', $location, $counter);
+                    $set = new DataType\Set($pbResponse->getSetValue(), $pbResponse->getContext());
+                    $this->response = new Command\DataType\Set\Response($this->success, 200, '', $location, $set);
                 } elseif ($pbResponse->getMapValue() === []) {
-                    $counter = new DataType\Map($pbResponse->getMapValue(), $pbResponse->getContext());
-                    $this->response = new Command\DataType\Map\Response($this->success, 200, '', $location, $counter);
+                    $map = new DataType\Map($pbResponse->getMapValue(), $pbResponse->getContext());
+                    $this->response = new Command\DataType\Map\Response($this->success, 200, '', $location, $map);
                 } else {
 
                 }
@@ -406,7 +406,7 @@ class Pb extends Api implements ApiInterface
     protected function buildCounterUpdateMessage($increment)
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp($this->buildCounterOp($increment, true));
+        $message->setOp(Api\Pb\Translator\DataTypeTranslator::buildCounterOp($increment, true));
 
         return $message;
     }
@@ -419,7 +419,7 @@ class Pb extends Api implements ApiInterface
     protected function buildSetUpdateMessage(array $adds = [], array $removes = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp($this->buildSetOp($adds, $removes, true));
+        $message->setOp(Api\Pb\Translator\DataTypeTranslator::buildSetOp($adds, $removes, true));
 
         return $message;
     }
@@ -433,104 +433,9 @@ class Pb extends Api implements ApiInterface
     protected function buildMapUpdateMessage(array $updates = [], array $removes = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp($this->buildMapOp($updates, $removes, true));
+        $message->setOp(Api\Pb\Translator\DataTypeTranslator::buildMapOp($updates, $removes, true));
 
         return $message;
-    }
-
-    /**
-     * @param $increment
-     * @param bool|false $returnAsDt
-     * @return Pb\Message\CounterOp|Pb\Message\DtOp
-     */
-    protected function buildCounterOp($increment, $returnAsDt = false)
-    {
-        $cop = new Api\Pb\Message\CounterOp();
-        $cop->setIncrement($increment);
-
-        if ($returnAsDt) {
-            $op = new Api\Pb\Message\DtOp();
-            $op->setCounterOp($cop);
-
-            return $op;
-        }
-
-        return $cop;
-    }
-
-    /**
-     * @param array $adds
-     * @param array $removes
-     * @param bool|false $returnAsDt
-     * @return Pb\Message\DtOp|Pb\Message\SetOp
-     */
-    protected function buildSetOp(array $adds, array $removes, $returnAsDt = false)
-    {
-        $sop = new Api\Pb\Message\SetOp();
-
-        foreach ($adds as $add) {
-            $sop->appendAdds($add);
-        }
-
-        foreach ($removes as $remove) {
-            $sop->appendRemoves($remove);
-        }
-
-        if ($returnAsDt) {
-            $op = new Api\Pb\Message\DtOp();
-            $op->setSetOp($sop);
-
-            return $op;
-        }
-
-        return $sop;
-    }
-
-    /**
-     * @param array $updates
-     * @param array $removes
-     * @param bool|false $returnAsDt
-     * @return Pb\Message\DtOp|Pb\Message\MapOp
-     * @throws Exception
-     */
-    protected function buildMapOp(array $updates, array $removes, $returnAsDt = false)
-    {
-        $mop = new Api\Pb\Message\MapOp();
-
-        foreach ($updates as $key => $update) {
-            $mapUpdate = new Api\Pb\Message\MapUpdate();
-
-            // [0] => key, [1] => type
-            $parts = explode('_', $key);
-            if ($parts[1] == DataType\Counter::TYPE) {
-                $mapUpdate->setCounterOp($this->buildCounterOp($update));
-            } elseif ($parts[1] == DataType\Set::TYPE) {
-                $mapUpdate->setSetOp($this->buildSetOp($update['add_all'], $update['remove_all']));
-            } elseif ($parts[1] == DataType\Map::TYPE) {
-                $mapUpdate->setMapOp($this->buildMapOp($update['update'], $update['remove']));
-            } elseif ($parts[1] == 'register') {
-                $mapUpdate->setRegisterOp($update);
-            } elseif ($parts[1] == 'flag') {
-                $mapUpdate->setFlagOp($update);
-            } else {
-                throw new Exception('Invalid map field type.');
-            }
-
-            $mop->appendUpdates($update);
-        }
-
-        foreach ($removes as $remove) {
-            $mop->appendRemoves($remove);
-        }
-
-        if ($returnAsDt) {
-            $op = new Api\Pb\Message\DtOp();
-            $op->setMapOp($mop);
-
-            return $op;
-        }
-
-        return $mop;
     }
 
     /**
