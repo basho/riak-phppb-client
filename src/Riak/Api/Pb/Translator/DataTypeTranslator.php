@@ -35,7 +35,7 @@ class DataTypeTranslator
      * @param bool|false $returnAsDt
      * @return Pb\Message\DtOp|Pb\Message\SetOp
      */
-    public static function buildSetOp(array $adds = [], array $removes = [], $returnAsDt = false)
+    public static function buildSetOp(array $adds, array $removes, $returnAsDt = false)
     {
         $sop = new Pb\Message\SetOp();
 
@@ -63,7 +63,7 @@ class DataTypeTranslator
      * @param bool|false $returnAsDt
      * @return Pb\Message\DtOp|Pb\Message\MapOp
      */
-    public static function buildMapOp(array $updates = [], array $removes = [], $returnAsDt = false)
+    public static function buildMapOp(array $updates, array $removes, $returnAsDt = false)
     {
         $mop = new Pb\Message\MapOp();
 
@@ -94,24 +94,29 @@ class DataTypeTranslator
     {
         $mapUpdate = new Pb\Message\MapUpdate();
 
-        $comp = static::compKeyToAssocArray($key);
+        $field = static::compKeyToMapField($key);
+        $mapUpdate->setField($field);
 
-        if ($comp['type'] == DataType\Counter::TYPE) {
-            $mapUpdate->setCounterOp(static::buildCounterOp($update));
-        } elseif ($comp['type'] == DataType\Set::TYPE) {
-            $adds = !empty($update['add_all']) ? $update['add_all'] : [];
-            $removes = !empty($update['remove_all']) ? $update['remove_all'] : [];
-            $mapUpdate->setSetOp(static::buildSetOp($adds, $removes));
-        } elseif ($comp['type'] == DataType\Map::TYPE) {
-            $updates = !empty($update['update']) ? $update['update'] : [];
-            $removes = !empty($update['remove']) ? $update['remove'] : [];
-            $mapUpdate->setMapOp(static::buildMapOp($updates, $removes));
-        } elseif ($comp['type'] == DataType\Map::REGISTER) {
-            $mapUpdate->setRegisterOp($update);
-        } elseif ($comp['type'] == DataType\Map::FLAG) {
-            $mapUpdate->setFlagOp($update);
-        } else {
-            throw new \InvalidArgumentException('Unknown map field type: ' . $key);
+        switch ($field->getType()) {
+            case MapField\MapFieldType::COUNTER:
+                $mapUpdate->setCounterOp(static::buildCounterOp($update));
+                break;
+            case MapField\MapFieldType::SET:
+                $adds = !empty($update['add_all']) ? $update['add_all'] : [];
+                $removes = !empty($update['remove_all']) ? $update['remove_all'] : [];
+                $mapUpdate->setSetOp(static::buildSetOp($adds, $removes));
+                break;
+            case MapField\MapFieldType::MAP:
+                $updates = !empty($update['update']) ? $update['update'] : [];
+                $removes = !empty($update['remove']) ? $update['remove'] : [];
+                $mapUpdate->setMapOp(static::buildMapOp($updates, $removes));
+                break;
+            case MapField\MapFieldType::FLAG:
+                $mapUpdate->setFlagOp($update);
+                break;
+            case MapField\MapFieldType::REGISTER:
+                $mapUpdate->setRegisterOp($update);
+                break;
         }
 
         return $mapUpdate;
