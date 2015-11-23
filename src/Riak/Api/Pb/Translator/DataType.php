@@ -2,14 +2,19 @@
 
 namespace Basho\Riak\Api\Pb\Translator;
 
+use Basho\Riak;
+use Basho\Riak\Api\Exception;
 use Basho\Riak\Api\Pb;
 use Basho\Riak\Api\Pb\Message\MapField;
+use Basho\Riak\Api\Pb\Message\MapEntry;
+use Basho\Riak\Api\Pb\Message\MapUpdate;
 use Basho\Riak\Command;
-use Basho\Riak\DataType;
 
-class DataTypeTranslator
+class DataType
 {
     /**
+     * Builds the Protobuff proto Op object for Counters
+     *
      * @param $increment
      * @param bool|false $returnAsDt
      * @return Pb\Message\CounterOp|Pb\Message\DtOp
@@ -30,6 +35,8 @@ class DataTypeTranslator
     }
 
     /**
+     * Builds the Protobuff proto Op object for Sets
+     *
      * @param array $adds
      * @param array $removes
      * @param bool|false $returnAsDt
@@ -58,6 +65,8 @@ class DataTypeTranslator
     }
 
     /**
+     * Builds the Protobuff proto Op object for Maps
+     *
      * @param array $updates
      * @param array $removes
      * @param bool|false $returnAsDt
@@ -85,11 +94,47 @@ class DataTypeTranslator
         return $mop;
     }
 
-    public static function entriesToObject(array $entries)
+    /**
+     * @param MapEntry[] $entries
+     * @return array
+     * @throws Exception
+     */
+    public static function mapEntriesToArray($entries)
     {
+        $map = [];
+        foreach ($entries as $entry) {
+            $key = static::mapFieldToCompKey($entry->getField());
+            switch ($entry->getField()->getType()) {
+                case MapField\MapFieldType::REGISTER:
+                    $map[$key] = $entry->getRegisterValue();
+                    break;
+                case MapField\MapFieldType::FLAG:
+                    $map[$key] = $entry->getFlagValue();
+                    break;
+                case MapField\MapFieldType::COUNTER:
+                    $map[$key] = $entry->getCounterValue();
+                    break;
+                case MapField\MapFieldType::SET:
+                    $map[$key] = $entry->getSetValue();
+                    break;
+                case MapField\MapFieldType::MAP:
+                    $map[$key] = static::mapEntriesToArray($entry->getMapValue());
+                    break;
+                default:
+                    throw new Exception('Invalid MapFieldType');
+            }
+        }
 
+        return $map;
     }
 
+    /**
+     * Convert command data to Protobuff proto MapUpdate object
+     *
+     * @param $key
+     * @param $update
+     * @return Pb\Message\MapUpdate
+     */
     public static function commandToMapUpdate($key, $update)
     {
         $mapUpdate = new Pb\Message\MapUpdate();
@@ -112,7 +157,7 @@ class DataTypeTranslator
                 $mapUpdate->setMapOp(static::buildMapOp($updates, $removes));
                 break;
             case MapField\MapFieldType::FLAG:
-                $mapUpdate->setFlagOp($update);
+                $mapUpdate->setFlagOp($update == 'enable' ? MapUpdate\FlagOp::ENABLE : MapUpdate\FlagOp::DISABLE);
                 break;
             case MapField\MapFieldType::REGISTER:
                 $mapUpdate->setRegisterOp($update);
@@ -122,6 +167,12 @@ class DataTypeTranslator
         return $mapUpdate;
     }
 
+    /**
+     * Convert composite map field key to Protobuff proto MapField object
+     *
+     * @param $key
+     * @return MapField
+     */
     public static function compKeyToMapField($key)
     {
         $mapField = new Pb\Message\MapField();
@@ -130,13 +181,13 @@ class DataTypeTranslator
         $mapField->setName($comp['key']);
 
         switch ($comp['type']) {
-            case DataType\Counter::TYPE:
+            case Riak\DataType\Counter::TYPE:
                 $mapField->setType(MapField\MapFieldType::COUNTER);
                 break;
-            case DataType\Set::TYPE:
+            case Riak\DataType\Set::TYPE:
                 $mapField->setType(MapField\MapFieldType::SET);
                 break;
-            case DataType\Map::TYPE:
+            case Riak\DataType\Map::TYPE:
                 $mapField->setType(MapField\MapFieldType::MAP);
                 break;
             case 'flag':
@@ -152,24 +203,30 @@ class DataTypeTranslator
         return $mapField;
     }
 
+    /**
+     * Convert Protobuff proto MapField object to composite key
+     *
+     * @param MapField $mapField
+     * @return string
+     */
     public static function mapFieldToCompKey(MapField $mapField)
     {
         $key = $mapField->getName() . '_';
         switch ($mapField->getType()) {
             case MapField\MapFieldType::COUNTER:
-                $key .= DataType\Counter::TYPE;
+                $key .= Riak\DataType\Counter::TYPE;
                 break;
             case MapField\MapFieldType::SET:
-                $key .= DataType\Set::TYPE;
+                $key .= Riak\DataType\Set::TYPE;
                 break;
             case MapField\MapFieldType::MAP:
-                $key .= DataType\Map::TYPE;
+                $key .= Riak\DataType\Map::TYPE;
                 break;
             case MapField\MapFieldType::REGISTER:
-                $key .= DataType\Map::REGISTER;
+                $key .= Riak\DataType\Map::REGISTER;
                 break;
             case MapField\MapFieldType::FLAG:
-                $key .= DataType\Map::FLAG;
+                $key .= Riak\DataType\Map::FLAG;
                 break;
             default:
                 throw new \InvalidArgumentException('Unknown map field type: ' . $key . $mapField->getType());
@@ -178,6 +235,12 @@ class DataTypeTranslator
         return $key;
     }
 
+    /**
+     * Convert composite key to an associative array ['key' => string, 'type' => string]
+     *
+     * @param $key
+     * @return array
+     */
     public static function compKeyToAssocArray($key)
     {
         $pos = strrpos($key, "_");

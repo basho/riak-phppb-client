@@ -6,10 +6,10 @@
  * Time: 2:51 PM
  */
 
-namespace Basho\Riak\Api\Pb\Message;
+namespace Basho\Riak\Api\Pb;
 
 
-class Codes
+class Message
 {
     const RpbErrorResp = 0;
     const RpbPingReq = 1;

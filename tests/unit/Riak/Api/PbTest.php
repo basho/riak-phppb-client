@@ -16,7 +16,9 @@ class PbTest extends TestCase
      */
     public function testApi($nodes)
     {
-        $riak = new Riak($nodes);
-        $this->assertInstanceOf('Basho\Riak\Api\Pb', $riak->getApi());
+        $riak = new Riak($nodes, [], new Riak\Api\Pb());
+        $api = $riak->getApi();
+
+        $this->assertInstanceOf('Basho\Riak\Api\Pb', $api);
     }
 }

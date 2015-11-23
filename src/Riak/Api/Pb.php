@@ -98,83 +98,81 @@ class Pb extends Api implements ApiInterface
 
         switch (get_class($this->command)) {
             case 'Basho\Riak\Command\Bucket\List':
-                $this->messageCode = Api\Pb\Message\Codes::RpbListBucketsReq;
+                $this->messageCode = Api\Pb\Message::RpbListBucketsReq;
                 $message = new Api\Pb\Message\RpbListBucketsReq();
                 break;
             case 'Basho\Riak\Command\Bucket\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbGetBucketReq;
+                $this->messageCode = Api\Pb\Message::RpbGetBucketReq;
                 $message = new Api\Pb\Message\RpbGetBucketReq();
                 break;
             case 'Basho\Riak\Command\Bucket\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbSetBucketReq;
+                $this->messageCode = Api\Pb\Message::RpbSetBucketReq;
                 $message = new Api\Pb\Message\RpbSetBucketReq();
                 break;
             case 'Basho\Riak\Command\Bucket\Delete':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message::RpbPutReq;
                 $message = new Api\Pb\Message\RpbPutReq();
                 break;
             case 'Basho\Riak\Command\Bucket\Keys':
-                $this->messageCode = Api\Pb\Message\Codes::RpbListKeysReq;
+                $this->messageCode = Api\Pb\Message::RpbListKeysReq;
                 $message = new Api\Pb\Message\RpbListKeysReq();
                 break;
             case 'Basho\Riak\Command\Object\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbGetReq;
+                $this->messageCode = Api\Pb\Message::RpbGetReq;
                 $message = new Api\Pb\Message\RpbGetReq();
                 break;
             case 'Basho\Riak\Command\Object\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message::RpbPutReq;
                 $message = new Api\Pb\Message\RpbPutReq();
                 $message->setContent($this->prepareContent());
                 break;
             case 'Basho\Riak\Command\Object\Delete':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPutReq;
+                $this->messageCode = Api\Pb\Message::RpbDelReq;
+                $message = new Api\Pb\Message\RpbDelReq();
                 break;
             case 'Basho\Riak\Command\DataType\Counter\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::DtFetchReq;
+            case 'Basho\Riak\Command\DataType\Set\Fetch':
+            case 'Basho\Riak\Command\DataType\Map\Fetch':
+                $this->messageCode = Api\Pb\Message::DtFetchReq;
+                $message = new Api\Pb\Message\DtFetchReq();
                 break;
             case 'Basho\Riak\Command\DataType\Counter\Store':
                 $message = $this->buildCounterUpdateMessage($this->command->getData()['increment']);
-                break;
-            case 'Basho\Riak\Command\DataType\Set\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::DtFetchReq;
                 break;
             case 'Basho\Riak\Command\DataType\Set\Store':
                 $data = $this->command->getData();
                 $message = $this->buildSetUpdateMessage($data['add_all'], $data['remove_all']);
                 break;
-            case 'Basho\Riak\Command\DataType\Map\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::DtFetchReq;
-                break;
             case 'Basho\Riak\Command\DataType\Map\Store':
                 $data = $this->command->getData();
-                $message = $this->buildMapUpdateMessage($data['update'], $data['remove']);
+                $message = $this->buildMapUpdateMessage($data['update'], !empty($data['remove']) ? $data['remove'] : []);
                 break;
             case 'Basho\Riak\Command\Search\Index\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaIndexGetReq;
+                $this->messageCode = Api\Pb\Message::RpbYokozunaIndexGetReq;
                 break;
             case 'Basho\Riak\Command\Search\Index\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaIndexPutReq;
+                $this->messageCode = Api\Pb\Message::RpbYokozunaIndexPutReq;
                 break;
             case 'Basho\Riak\Command\Search\Index\Delete':
-                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaIndexDeleteReq;
+                $this->messageCode = Api\Pb\Message::RpbYokozunaIndexDeleteReq;
                 break;
             case 'Basho\Riak\Command\Search\Schema\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaSchemaGetReq;
+                $this->messageCode = Api\Pb\Message::RpbYokozunaSchemaGetReq;
                 break;
             case 'Basho\Riak\Command\Search\Schema\Store':
-                $this->messageCode = Api\Pb\Message\Codes::RpbYokozunaSchemaPutReq;
+                $this->messageCode = Api\Pb\Message::RpbYokozunaSchemaPutReq;
                 break;
             case 'Basho\Riak\Command\Search\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbSearchQueryReq;
+                $this->messageCode = Api\Pb\Message::RpbSearchQueryReq;
                 break;
             case 'Basho\Riak\Command\MapReduce\Fetch':
-                $this->messageCode = Api\Pb\Message\Codes::RpbMapRedReq;
+                $this->messageCode = Api\Pb\Message::RpbMapRedReq;
                 break;
             case 'Basho\Riak\Command\Indexes\Query':
-                $this->messageCode = Api\Pb\Message\Codes::RpbMapRedReq;
+                $this->messageCode = Api\Pb\Message::RpbMapRedReq;
                 break;
             case 'Basho\Riak\Command\Ping':
-                $this->messageCode = Api\Pb\Message\Codes::RpbPingReq;
+                $this->messageCode = Api\Pb\Message::RpbPingReq;
                 $message = '';
                 break;
             default:
@@ -253,6 +251,8 @@ class Pb extends Api implements ApiInterface
             $message = $this->requestMessage->serializeToString();
         }
 
+        $this->debug($this->requestMessage);
+
         $packedMessage = $this->packMessage($this->messageCode, $message);
 
         $written = fwrite($this->connection, $packedMessage);
@@ -266,42 +266,53 @@ class Pb extends Api implements ApiInterface
 
         // read response message code
         $array = unpack("C", stream_get_contents($this->connection, 1));
-        $code = $array[1];
+        $message_code = $array[1];
 
         // read response message
         $message = stream_get_contents($this->connection, $length - 1);
 
-        $this->parseResponse($code, $message);
+        $this->parseResponse($message_code, $message);
 
         return $this->success;
     }
 
     /**
-     * @param $code
-     * @param string $message
+     * Parses the Protobuff response and builds the proper response object to forward on. Note: This method attempts to
+     * maintain parity with the HTTP interface for the status codes returned for consistency purposes.
+     *
+     *  200 = Success, content returned
+     *  201 = Created
+     *  204 = Success, no content returned
+     *  300 = Multiple choices
+     *  404 = Not found
+     *
+     * @param $message_code     PB Message identifier @see Basho\Riak\Api\Pb\Message
+     * @param string $message   Binary message
      * @throws Exception
      * @internal param string $response
      */
-    protected function parseResponse($code, $message = '')
+    protected function parseResponse($message_code, $message = '')
     {
         $this->success = true;
-        switch ($code) {
-            case Api\Pb\Message\Codes::RpbErrorResp:
+        $code = 204;
+        $location = null;
+        switch ($message_code) {
+            case Api\Pb\Message::RpbErrorResp:
                 $pbResponse = new Api\Pb\Message\RpbErrorResp();
                 $pbResponse->parseFromString($message);
                 $this->success = false;
                 $this->error = $pbResponse->getErrmsg();
                 $this->response = new Command\Response($this->success, $pbResponse->getErrcode(), $this->error);
                 break;
-            case Api\Pb\Message\Codes::RpbPingResp:
-                $this->response = new Command\Response($this->success, 200, '');
+            case Api\Pb\Message::RpbPingResp:
+                $this->response = new Command\Response($this->success, $code, '');
                 break;
-            case Api\Pb\Message\Codes::RpbPutResp:
-                $location = null;
+            case Api\Pb\Message::RpbPutResp:
                 $pbResponse = new Api\Pb\Message\RpbPutResp();
                 $pbResponse->parseFromString($message);
 
                 if ($pbResponse->getKey()) {
+                    $code = 201;
                     $location = new Location($pbResponse->getKey(), $this->getCommand()->getBucket());
                 }
 
@@ -323,10 +334,14 @@ class Pb extends Api implements ApiInterface
                     $objects[] = $object;
                 }
 
-                $this->response = new Command\Object\Response($this->success, 200, '', $location, $objects);
+                if ($objects) {
+                    $code = 200;
+                }
+
+                $this->response = new Command\Object\Response($this->success, $code, '', $location, $objects);
                 break;
-            case Api\Pb\Message\Codes::RpbGetResp:
-                $location = null;
+            case Api\Pb\Message::RpbGetResp:
+                $code = 404;
                 $pbResponse = new Api\Pb\Message\RpbGetResp();
                 $pbResponse->parseFromString($message);
 
@@ -348,24 +363,69 @@ class Pb extends Api implements ApiInterface
                     $objects[] = $object;
                 }
 
-                $this->response = new Command\Object\Response($this->success, 200, '', $location, $objects);
+                if ($objects) {
+                    $code = 200;
+                }
+
+                $this->response = new Command\Object\Response($this->success, $code, '', $location, $objects);
                 break;
-            case Api\Pb\Message\Codes::DtUpdateResp:
-                $location = null;
+            case Api\Pb\Message::RpbDelResp:
+                $this->response = new Command\Response($this->success, $code, '');
+                break;
+            case Api\Pb\Message::DtUpdateResp:
                 $pbResponse = new Api\Pb\Message\DtUpdateResp();
                 $pbResponse->parseFromString($message);
 
-                if ($pbResponse->getCounterValue() === null) {
-                    $counter = new DataType\Counter($pbResponse->getCounterValue());
-                    $this->response = new Command\DataType\Counter\Response($this->success, 200, '', $location, $counter);
-                } elseif ($pbResponse->getSetValue() === []) {
-                    $set = new DataType\Set($pbResponse->getSetValue(), $pbResponse->getContext());
-                    $this->response = new Command\DataType\Set\Response($this->success, 200, '', $location, $set);
-                } elseif ($pbResponse->getMapValue() === []) {
-                    $map = new DataType\Map($pbResponse->getMapValue(), $pbResponse->getContext());
-                    $this->response = new Command\DataType\Map\Response($this->success, 200, '', $location, $map);
-                } else {
+                if ($pbResponse->getKey()) {
+                    $code = 201;
+                    $location = new Location($pbResponse->getKey(), $this->getCommand()->getBucket());
+                }
 
+                if ($pbResponse->getCounterValue()) {
+                    $counter = new DataType\Counter($pbResponse->getCounterValue());
+                    $this->response = new Command\DataType\Counter\Response($this->success, $code, '', $location, $counter);
+                } elseif ($pbResponse->getSetValueCount()) {
+                    $set = new DataType\Set($pbResponse->getSetValue(), $pbResponse->getContext());
+                    $this->response = new Command\DataType\Set\Response($this->success, $code, '', $location, $set);
+                } elseif ($pbResponse->getMapValueCount()) {
+                    $map = new DataType\Map(Api\Pb\Translator\DataType::mapEntriesToArray($pbResponse->getMapValue()), $pbResponse->getContext());
+                    $this->response = new Command\DataType\Map\Response($this->success, $code, '', $location, $map);
+                } else {
+                    $command = get_class($this->command);
+                    if ($command == 'Basho\Riak\Command\DataType\Counter\Store') {
+                        $this->response = new Command\DataType\Counter\Response($this->success, $code, '', $location);
+                    } elseif ($command == 'Basho\Riak\Command\DataType\Set\Store') {
+                        $this->response = new Command\DataType\Set\Response($this->success, $code, '', $location);
+                    } elseif ($command == 'Basho\Riak\Command\DataType\Map\Store') {
+                        $this->response = new Command\DataType\Map\Response($this->success, $code, '', $location);
+                    }
+                }
+                break;
+            case Api\Pb\Message::DtFetchResp:
+                $code = 200;
+                $pbResponse = new Api\Pb\Message\DtFetchResp();
+                $pbResponse->parseFromString($message);
+
+                // if value is null, the DT couldn't be found
+                if (!empty($pbResponse->getValue())) {
+                    switch ($pbResponse->getType()) {
+                        case Api\Pb\Message\DtFetchResp\DataType::COUNTER:
+                            $counter = new DataType\Counter($pbResponse->getValue()->getCounterValue());
+                            $this->response = new Command\DataType\Counter\Response($this->success, $code, '', null, $counter);
+                            break;
+                        case Api\Pb\Message\DtFetchResp\DataType::SET:
+                            $set = new DataType\Set($pbResponse->getValue()->getSetValue(), $pbResponse->getContext());
+                            $this->response = new Command\DataType\Set\Response($this->success, $code, '', null, $set);
+                            break;
+                        case Api\Pb\Message\DtFetchResp\DataType::MAP:
+                            $map = new DataType\Map(Api\Pb\Translator\DataType::mapEntriesToArray($pbResponse->getValue()->getMapValue()), $pbResponse->getContext());
+                            $this->response = new Command\DataType\Map\Response($this->success, $code, '', null, $map);
+                            break;
+                        default:
+                            throw new Exception('Unknown data type.');
+                    }
+                } else {
+                    $this->response = new Command\Response($this->success, 404, '');
                 }
                 break;
             default:
@@ -395,7 +455,7 @@ class Pb extends Api implements ApiInterface
      */
     protected function buildDataTypeMessage()
     {
-        $this->messageCode = Api\Pb\Message\Codes::DtUpdateReq;
+        $this->messageCode = Api\Pb\Message::DtUpdateReq;
         return new Api\Pb\Message\DtUpdateReq();
     }
 
@@ -406,7 +466,7 @@ class Pb extends Api implements ApiInterface
     protected function buildCounterUpdateMessage($increment)
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataTypeTranslator::buildCounterOp($increment, true));
+        $message->setOp(Api\Pb\Translator\DataType::buildCounterOp($increment, true));
 
         return $message;
     }
@@ -419,7 +479,7 @@ class Pb extends Api implements ApiInterface
     protected function buildSetUpdateMessage(array $adds = [], array $removes = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataTypeTranslator::buildSetOp($adds, $removes, true));
+        $message->setOp(Api\Pb\Translator\DataType::buildSetOp($adds, $removes, true));
 
         return $message;
     }
@@ -433,7 +493,7 @@ class Pb extends Api implements ApiInterface
     protected function buildMapUpdateMessage(array $updates = [], array $removes = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataTypeTranslator::buildMapOp($updates, $removes, true));
+        $message->setOp(Api\Pb\Translator\DataType::buildMapOp($updates, $removes, true));
 
         return $message;
     }
@@ -464,5 +524,11 @@ class Pb extends Api implements ApiInterface
     protected function setOptionsOnMessage(\ProtobufMessage &$message, Command $command)
     {
         // TODO: RETURN_BODY, R, W, PR, PW, DW, N, etc
+    }
+
+    protected function debug($value) {
+        if ($this->command->isVerbose()) {
+            echo "\n" . print_r($value, true);
+        }
     }
 }

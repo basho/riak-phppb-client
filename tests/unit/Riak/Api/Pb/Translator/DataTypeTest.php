@@ -5,10 +5,10 @@ namespace Basho\Tests\Riak\Api\Pb\Translator;
 use Basho\Riak\Api\Pb\Message\CounterOp;
 use Basho\Riak\Api\Pb\Message\MapOp;
 use Basho\Riak\Api\Pb\Message\SetOp;
-use Basho\Riak\Api\Pb\Translator\DataTypeTranslator;
+use Basho\Riak\Api\Pb\Translator\DataType;
 use Basho\Tests\TestCase;
 
-class DataTypeTranslatorTest extends TestCase
+class DataTypeTest extends TestCase
 {
     const COUNTER_INCREMENT = 1;
     const SET_ADDS = ['Eichel', 'Ennis', 'Bogosian'];
@@ -24,32 +24,32 @@ class DataTypeTranslatorTest extends TestCase
 
     public function testCompKeyToAssoc()
     {
-        $comp = DataTypeTranslator::compKeyToAssocArray('roster_register');
+        $comp = DataType::compKeyToAssocArray('roster_register');
         $this->assertEquals(['key' => 'roster', 'type' => 'register'], $comp);
 
-        $comp = DataTypeTranslator::compKeyToAssocArray('roster_flag');
+        $comp = DataType::compKeyToAssocArray('roster_flag');
         $this->assertEquals(['key' => 'roster', 'type' => 'flag'], $comp);
 
-        $comp = DataTypeTranslator::compKeyToAssocArray('roster_counter');
+        $comp = DataType::compKeyToAssocArray('roster_counter');
         $this->assertEquals(['key' => 'roster', 'type' => 'counter'], $comp);
 
-        $comp = DataTypeTranslator::compKeyToAssocArray('roster_set');
+        $comp = DataType::compKeyToAssocArray('roster_set');
         $this->assertEquals(['key' => 'roster', 'type' => 'set'], $comp);
 
-        $comp = DataTypeTranslator::compKeyToAssocArray('roster_map');
+        $comp = DataType::compKeyToAssocArray('roster_map');
         $this->assertEquals(['key' => 'roster', 'type' => 'map'], $comp);
 
-        $comp = DataTypeTranslator::compKeyToAssocArray('multiple_underscores_map');
+        $comp = DataType::compKeyToAssocArray('multiple_underscores_map');
         $this->assertEquals(['key' => 'multiple_underscores', 'type' => 'map'], $comp);
     }
 
     public function testBuildCounterOp()
     {
-        $op = DataTypeTranslator::buildCounterOp(static::COUNTER_INCREMENT, false);
+        $op = DataType::buildCounterOp(static::COUNTER_INCREMENT, false);
 
         $this->counterOpAssertions($op);
 
-        $op = DataTypeTranslator::buildCounterOp(static::COUNTER_INCREMENT, true);
+        $op = DataType::buildCounterOp(static::COUNTER_INCREMENT, true);
 
         $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\DtOp', $op);
         $this->counterOpAssertions($op->getCounterOp());
@@ -57,11 +57,11 @@ class DataTypeTranslatorTest extends TestCase
 
     public function testBuildSetOp()
     {
-        $op = DataTypeTranslator::buildSetOp(static::SET_ADDS, static::SET_REMOVES, false);
+        $op = DataType::buildSetOp(static::SET_ADDS, static::SET_REMOVES, false);
 
         $this->setOpAssertions($op);
 
-        $op = DataTypeTranslator::buildSetOp(static::SET_ADDS, static::SET_REMOVES, true);
+        $op = DataType::buildSetOp(static::SET_ADDS, static::SET_REMOVES, true);
 
         $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\DtOp', $op);
         $this->setOpAssertions($op->getSetOp());
@@ -69,11 +69,11 @@ class DataTypeTranslatorTest extends TestCase
 
     public function testBuildMapOp()
     {
-        $op = DataTypeTranslator::buildMapOp(static::MAP_UPDATES, static::MAP_REMOVES, false);
+        $op = DataType::buildMapOp(static::MAP_UPDATES, static::MAP_REMOVES, false);
 
         $this->mapOpAssertions($op);
 
-        $op = DataTypeTranslator::buildMapOp(static::MAP_UPDATES, static::MAP_REMOVES, true);
+        $op = DataType::buildMapOp(static::MAP_UPDATES, static::MAP_REMOVES, true);
 
         $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\DtOp', $op);
         $this->mapOpAssertions($op->getMapOp());
@@ -101,7 +101,7 @@ class DataTypeTranslatorTest extends TestCase
         $this->assertEquals(1, $op->getRemovesCount());
 
         foreach ($op->getUpdates() as $update) {
-            switch (DataTypeTranslator::mapFieldToCompKey($update->getField())) {
+            switch (DataType::mapFieldToCompKey($update->getField())) {
                 case 'roster_set':
                     $this->setOpAssertions($update->getSetOp());
                     break;
@@ -125,7 +125,7 @@ class DataTypeTranslatorTest extends TestCase
         }
 
         foreach ($op->getRemoves() as $remove) {
-            $this->assertContains(DataTypeTranslator::mapFieldToCompKey($remove), static::MAP_REMOVES);
+            $this->assertContains(DataType::mapFieldToCompKey($remove), static::MAP_REMOVES);
         }
     }
 }
