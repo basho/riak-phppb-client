@@ -46,8 +46,10 @@ class Pb extends Api implements ApiInterface
 
     public function closeConnection()
     {
-        fclose($this->connection);
-        $this->connection = null;
+        if ($this->connection) {
+            fclose($this->connection);
+            $this->connection = null;
+        }
     }
 
     /**
@@ -136,21 +138,27 @@ class Pb extends Api implements ApiInterface
                 break;
             case 'Basho\Riak\Command\Search\Index\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaIndexGetReq;
+                $message = new Api\Pb\Message\RpbYokozunaIndexGetReq();
                 break;
             case 'Basho\Riak\Command\Search\Index\Store':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaIndexPutReq;
+                $message = new Api\Pb\Message\RpbYokozunaIndexPutReq();
                 break;
             case 'Basho\Riak\Command\Search\Index\Delete':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaIndexDeleteReq;
+                $message = new Api\Pb\Message\RpbYokozunaIndexDeleteReq();
                 break;
             case 'Basho\Riak\Command\Search\Schema\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaSchemaGetReq;
+                $message = new Api\Pb\Message\RpbYokozunaSchemaGetReq();
                 break;
             case 'Basho\Riak\Command\Search\Schema\Store':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaSchemaPutReq;
+                $message = new Api\Pb\Message\RpbYokozunaSchemaPutReq();
                 break;
             case 'Basho\Riak\Command\Search\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbSearchQueryReq;
+                $message = new Api\Pb\Message\RpbSearchQueryReq();
                 break;
             case 'Basho\Riak\Command\MapReduce\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbMapRedReq;
@@ -159,7 +167,8 @@ class Pb extends Api implements ApiInterface
                 $message->setRequest($this->command->getEncodedData());
                 break;
             case 'Basho\Riak\Command\Indexes\Query':
-                $this->messageCode = Api\Pb\Message::RpbMapRedReq;
+                $this->messageCode = Api\Pb\Message::RpbIndexReq;
+                $message = new Api\Pb\Message\RpbIndexReq();
                 break;
             case 'Basho\Riak\Command\Ping':
                 $this->messageCode = Api\Pb\Message::RpbPingReq;
@@ -169,9 +178,11 @@ class Pb extends Api implements ApiInterface
                 throw new Api\Exception('Command is invalid.');
         }
 
-        $this->setLocationOnMessage($message, $this->command->getLocation());
-        $this->setBucketOnMessage($message, $this->command->getBucket());
-        $this->setOptionsOnMessage($message, $this->command);
+        if ($message) {
+            $this->setLocationOnMessage($message, $this->command->getLocation());
+            $this->setBucketOnMessage($message, $this->command->getBucket());
+            $this->setOptionsOnMessage($message, $this->command);
+        }
 
         $this->requestMessage = $message;
 
@@ -307,7 +318,7 @@ class Pb extends Api implements ApiInterface
                 $this->response = new Command\Response($this->success, $pbResponse->getErrcode(), $this->error);
                 break;
             case Api\Pb\Message::RpbPingResp:
-                $this->response = new Command\Response($this->success, $code, '');
+                $this->response = new Command\Response($this->success, 200, '');
                 break;
             case Api\Pb\Message::RpbPutResp:
                 $pbResponse = new Api\Pb\Message\RpbPutResp();

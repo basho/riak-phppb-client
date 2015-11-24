@@ -4,6 +4,7 @@ namespace Basho\Tests\Riak\Api\Pb\Translator;
 
 use Basho\Riak\Api\Pb\Message\CounterOp;
 use Basho\Riak\Api\Pb\Message\MapOp;
+use Basho\Riak\Api\Pb\Message\MapUpdate\FlagOp;
 use Basho\Riak\Api\Pb\Message\SetOp;
 use Basho\Riak\Api\Pb\Translator\DataType;
 use Basho\Tests\TestCase;
@@ -106,7 +107,7 @@ class DataTypeTest extends TestCase
                     $this->setOpAssertions($update->getSetOp());
                     break;
                 case 'clinch_playoffs_flag':
-                    $this->assertEmpty($update->getFlagOp());
+                    $this->assertEquals(FlagOp::DISABLE, $update->getFlagOp());
                     break;
                 case 'win_counter':
                     $this->counterOpAssertions($update->getCounterOp());

@@ -10,12 +10,10 @@ use Basho\Tests\TestCase;
  */
 class PbTest extends TestCase
 {
-    /**
-     * @dataProvider getCluster
-     * @param $nodes array
-     */
-    public function testApi($nodes)
+    public function testApi()
     {
+        $nodes = static::getCluster();
+
         $riak = new Riak($nodes, [], new Riak\Api\Pb());
         $api = $riak->getApi();
 
