@@ -1,20 +1,5 @@
 <?php
 
-/*
-Copyright 2015 Basho Technologies, Inc.
-
-Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations under the License.
-*/
-
 namespace Basho\Riak\Api;
 
 use Basho\Riak\Api;
@@ -78,7 +63,9 @@ class Pb extends Api implements ApiInterface
         // call parent prepare method to setup object members
         parent::prepare($command, $node);
 
-        $this->openConnection();
+        if ($this->connection === null) {
+            $this->openConnection();
+        }
 
         // determine message code and build message content
         $this->prepareMessage();
@@ -167,6 +154,9 @@ class Pb extends Api implements ApiInterface
                 break;
             case 'Basho\Riak\Command\MapReduce\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbMapRedReq;
+                $message = new Api\Pb\Message\RpbMapRedReq();
+                $message->setContentType(Http::CONTENT_TYPE_JSON);
+                $message->setRequest($this->command->getEncodedData());
                 break;
             case 'Basho\Riak\Command\Indexes\Query':
                 $this->messageCode = Api\Pb\Message::RpbMapRedReq;
@@ -260,20 +250,32 @@ class Pb extends Api implements ApiInterface
             throw new Api\Exception('Failed to write to socket.');
         }
 
-        // read response message length
-        $array = unpack("N", stream_get_contents($this->connection, 4));
-        $length = $array[1];
-
-        // read response message code
-        $array = unpack("C", stream_get_contents($this->connection, 1));
-        $message_code = $array[1];
-
-        // read response message
-        $message = stream_get_contents($this->connection, $length - 1);
+        $length = $this->readMessageLength();
+        $message_code = $this->readMessageCode();
+        $message = $this->readMessage($length);
 
         $this->parseResponse($message_code, $message);
 
         return $this->success;
+    }
+
+    public function readMessageLength()
+    {
+        // read response message length
+        $array = unpack("N", stream_get_contents($this->connection, 4));
+        return $array[1];
+    }
+
+    public function readMessageCode()
+    {
+        // read response message code
+        $array = unpack("C", stream_get_contents($this->connection, 1));
+        return $array[1];
+    }
+
+    public function readMessage($length)
+    {
+        return stream_get_contents($this->connection, $length - 1);
     }
 
     /**
@@ -427,6 +429,34 @@ class Pb extends Api implements ApiInterface
                 } else {
                     $this->response = new Command\Response($this->success, 404, '');
                 }
+                break;
+            case Api\Pb\Message::RpbMapRedResp:
+                $code = null;
+                $results = [];
+                $pbResponse = new Api\Pb\Message\RpbMapRedResp();
+                $pbResponse->parseFromString($message);
+
+                while ($code === null) {
+                    $this->debug($pbResponse);
+                    if (!$pbResponse->getDone()) {
+                        // We haven't received all responses from Riak, merge the results
+                        $results = array_merge($results, json_decode($pbResponse->getResponse()));
+
+                        // Continue reading from the socket
+                        $length = $this->readMessageLength();
+                        if ($this->readMessageCode() != Api\Pb\Message::RpbMapRedResp) {
+                            throw new Exception('Unknown response from Riak.');
+                        }
+                        $message = $this->readMessage($length);
+                        $pbResponse = new Api\Pb\Message\RpbMapRedResp();
+                        $pbResponse->parseFromString($message);
+                    } else {
+                        // All responses from Riak are complete, return a 200 code
+                        $code = 200;
+                    }
+                }
+
+                $this->response = new Command\MapReduce\Response($this->success, $code, '', $results);
                 break;
             default:
                 throw new Api\Exception('Mishandled PB response.');
