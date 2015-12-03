@@ -10,6 +10,7 @@ use Basho\Riak\DataType;
 use Basho\Riak\Location;
 use Basho\Riak\Node;
 use Basho\Riak\Object;
+use Basho\Riak\Search\Doc;
 
 /**
  * Handles communications between end user app & Riak PB API using persistent sockets
@@ -43,14 +44,6 @@ class Pb extends Api implements ApiInterface
      * @var \ProtobufMessage|null
      */
     protected $responseMessage = null;
-
-    public function closeConnection()
-    {
-        if ($this->connection) {
-            fclose($this->connection);
-            $this->connection = null;
-        }
-    }
 
     /**
      * Prepare request to be sent
@@ -97,6 +90,13 @@ class Pb extends Api implements ApiInterface
             case 'Basho\Riak\Command\Bucket\Store':
                 $this->messageCode = Api\Pb\Message::RpbSetBucketReq;
                 $message = new Api\Pb\Message\RpbSetBucketReq();
+                $props = new Api\Pb\Message\RpbBucketProps();
+
+                foreach ($this->command->getData()['props'] as $prop => $value) {
+                    $method = 'set' . str_replace("_","",ucwords($prop, "_"));
+                    $props->{$method}($value);
+                }
+                $message->setProps($props);
                 break;
             case 'Basho\Riak\Command\Bucket\Delete':
                 $this->messageCode = Api\Pb\Message::RpbPutReq;
@@ -139,26 +139,59 @@ class Pb extends Api implements ApiInterface
             case 'Basho\Riak\Command\Search\Index\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaIndexGetReq;
                 $message = new Api\Pb\Message\RpbYokozunaIndexGetReq();
+                $message->setName("{$this->command}");
                 break;
             case 'Basho\Riak\Command\Search\Index\Store':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaIndexPutReq;
                 $message = new Api\Pb\Message\RpbYokozunaIndexPutReq();
+                $index = new Api\Pb\Message\RpbYokozunaIndex();
+                $index->setName("{$this->command}");
+                $index->setSchema($this->command->getData()['schema']);
+                $message->setIndex($index);
                 break;
             case 'Basho\Riak\Command\Search\Index\Delete':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaIndexDeleteReq;
                 $message = new Api\Pb\Message\RpbYokozunaIndexDeleteReq();
+                $message->setName("{$this->command}");
                 break;
             case 'Basho\Riak\Command\Search\Schema\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaSchemaGetReq;
                 $message = new Api\Pb\Message\RpbYokozunaSchemaGetReq();
+                $message->setName("{$this->command}");
                 break;
             case 'Basho\Riak\Command\Search\Schema\Store':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaSchemaPutReq;
                 $message = new Api\Pb\Message\RpbYokozunaSchemaPutReq();
+                $schema = new Api\Pb\Message\RpbYokozunaSchema();
+                $schema->setName("{$this->command}");
+                $schema->setContent($this->command->getData());
+                $message->setSchema($schema);
                 break;
             case 'Basho\Riak\Command\Search\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbSearchQueryReq;
                 $message = new Api\Pb\Message\RpbSearchQueryReq();
+                $message->setIndex("{$this->command}");
+
+                // Iterate over parameters, explicitly accepting known / allowed keys only for security reasons
+                foreach ($this->command->getParameters() as $key => $value) {
+                    if ($key == 'fl') {
+                        foreach ($value as $field) {
+                            $message->appendFl($field);
+                        }
+                    } elseif($key == 'q') {
+                        $message->setQ($value);
+                    } elseif($key == 'rows') {
+                        $message->setRows($value);
+                    } elseif($key == 'start') {
+                        $message->setStart($value);
+                    } elseif($key == 'sort') {
+                        $message->setSort($value);
+                    } elseif($key == 'fq') {
+                        $message->setFilter($value);
+                    } elseif($key == 'df') {
+                        $message->setFilter($value);
+                    }
+                }
                 break;
             case 'Basho\Riak\Command\MapReduce\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbMapRedReq;
@@ -187,57 +220,6 @@ class Pb extends Api implements ApiInterface
         $this->requestMessage = $message;
 
         return $this;
-    }
-
-    /**
-     * @param $code
-     * @param string $payload
-     * @return string
-     */
-    protected function packMessage($code, $payload = '')
-    {
-        // https://github.com/basho/riak_pb#protocol
-        return pack("NC", 1 + strlen($payload), $code) . $payload;
-    }
-
-    /**
-     * Prepares the Riak PB message structure
-     *
-     * @return Api\Pb\Message\RpbContent
-     */
-    protected function prepareContent()
-    {
-        /** @var Command\Object $command */
-        $command = $this->command;
-
-        $content = new Api\Pb\Message\RpbContent();
-        $content->setValue($command->getEncodedData());
-        $content->setContentType($command->getObject()->getContentType());
-        $content->setCharset($command->getObject()->getCharset());
-        $content->setContentEncoding($command->getObject()->getContentEncoding());
-
-        // append secondary indexes to the Content object
-        foreach ($command->getObject()->getIndexes() as $key => $value) {
-            $content->appendIndexes($this->toRpbPair($key, $value));
-        }
-
-        return $content;
-    }
-
-    /**
-     * Converts to Riak PB Pair message structure
-     *
-     * @param $key
-     * @param $value
-     * @return Api\Pb\Message\RpbPair
-     */
-    protected function toRpbPair($key, $value)
-    {
-        $pair = new Api\Pb\Message\RpbPair();
-        $pair->setKey($key);
-        $pair->setValue($value);
-
-        return $pair;
     }
 
     /**
@@ -270,25 +252,6 @@ class Pb extends Api implements ApiInterface
         return $this->success;
     }
 
-    public function readMessageLength()
-    {
-        // read response message length
-        $array = unpack("N", stream_get_contents($this->connection, 4));
-        return $array[1];
-    }
-
-    public function readMessageCode()
-    {
-        // read response message code
-        $array = unpack("C", stream_get_contents($this->connection, 1));
-        return $array[1];
-    }
-
-    public function readMessage($length)
-    {
-        return stream_get_contents($this->connection, $length - 1);
-    }
-
     /**
      * Parses the Protobuff response and builds the proper response object to forward on. Note: This method attempts to
      * maintain parity with the HTTP interface for the status codes returned for consistency purposes.
@@ -313,12 +276,23 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::RpbErrorResp:
                 $pbResponse = new Api\Pb\Message\RpbErrorResp();
                 $pbResponse->parseFromString($message);
-                $this->success = false;
                 $this->error = $pbResponse->getErrmsg();
-                $this->response = new Command\Response($this->success, $pbResponse->getErrcode(), $this->error);
-                break;
-            case Api\Pb\Message::RpbPingResp:
-                $this->response = new Command\Response($this->success, 200, '');
+
+                // intercept error for malformed query
+                if (strpos($message, "Query unsuccessful") !== false) {
+                    $code = 400;
+                    $this->response = new Command\Search\Response($this->success, $code, '', null);
+                    break;
+                }
+
+                // intercept notfound "error"
+                if (strpos($message, "notfound") !== false) {
+                    $code = 404;
+                } else {
+                    $code = $pbResponse->getErrcode();
+                    $this->success = false;
+                }
+                $this->response = new Command\Response($this->success, $code, $this->error);
                 break;
             case Api\Pb\Message::RpbPutResp:
                 $pbResponse = new Api\Pb\Message\RpbPutResp();
@@ -382,7 +356,11 @@ class Pb extends Api implements ApiInterface
 
                 $this->response = new Command\Object\Response($this->success, $code, '', $location, $objects);
                 break;
+            /** @noinspection PhpMissingBreakStatementInspection */
+            case Api\Pb\Message::RpbPingResp:
+                $code = 200;
             case Api\Pb\Message::RpbDelResp:
+            case Api\Pb\Message::RpbSetBucketResp:
                 $this->response = new Command\Response($this->success, $code, '');
                 break;
             case Api\Pb\Message::DtUpdateResp:
@@ -469,9 +447,68 @@ class Pb extends Api implements ApiInterface
 
                 $this->response = new Command\MapReduce\Response($this->success, $code, '', $results);
                 break;
+            case Api\Pb\Message::RpbSearchQueryResp:
+                $code = 200;
+                $docs = [];
+                $pbResponse = new Api\Pb\Message\RpbSearchQueryResp();
+                $pbResponse->parseFromString($message);
+
+                foreach ($pbResponse->getDocs() as $pbDoc) {
+                    $doc = new \stdClass();
+                    foreach ($pbDoc->getFields() as $rpbPair) {
+                        $doc->{$rpbPair->getKey()} = $rpbPair->getValue();
+                    }
+                    $docs[] = new Doc($doc);
+                }
+
+                $this->response = new Command\Search\Response($this->success, $code, '', $pbResponse->getNumFound(), $docs);
+                break;
+            case Api\Pb\Message::RpbYokozunaIndexGetResp:
+                $code = 200;
+                $pbResponse = new Api\Pb\Message\RpbYokozunaIndexGetResp();
+                $pbResponse->parseFromString($message);
+                $index = new \stdClass();
+                $index->name = $pbResponse->getIndexAt(0)->getName();
+                $index->n_val = $pbResponse->getIndexAt(0)->getNVal();
+                $index->schema = $pbResponse->getIndexAt(0)->getSchema();
+
+                $this->response = new Command\Search\Index\Response($this->success, $code, '', $index);
+                break;
+            case Api\Pb\Message::RpbYokozunaSchemaGetResp:
+                $code = 200;
+                $pbResponse = new Api\Pb\Message\RpbYokozunaSchemaGetResp();
+                var_dump($message);
+                $pbResponse->parseFromString($message);
+
+                $this->response = new Command\Search\Schema\Response($this->success, $code, '', $pbResponse->getSchema(), Http::CONTENT_TYPE_XML);
+                break;
             default:
                 throw new Api\Exception('Mishandled PB response.');
         }
+    }
+
+    /**
+     * Prepares the Riak PB message structure
+     *
+     * @return Api\Pb\Message\RpbContent
+     */
+    protected function prepareContent()
+    {
+        /** @var Command\Object $command */
+        $command = $this->command;
+
+        $content = new Api\Pb\Message\RpbContent();
+        $content->setValue($command->getEncodedData());
+        $content->setContentType($command->getObject()->getContentType());
+        $content->setCharset($command->getObject()->getCharset());
+        $content->setContentEncoding($command->getObject()->getContentEncoding());
+
+        // append secondary indexes to the Content object
+        foreach ($command->getObject()->getIndexes() as $key => $value) {
+            $content->appendIndexes($this->toRpbPair($key, $value));
+        }
+
+        return $content;
     }
 
     /**
@@ -489,6 +526,14 @@ class Pb extends Api implements ApiInterface
         }
 
         return $this;
+    }
+
+    public function closeConnection()
+    {
+        if ($this->connection) {
+            fclose($this->connection);
+            $this->connection = null;
+        }
     }
 
     /**
@@ -571,5 +616,51 @@ class Pb extends Api implements ApiInterface
         if ($this->command->isVerbose()) {
             echo "\n" . print_r($value, true);
         }
+    }
+
+    /**
+     * Converts to Riak PB Pair message structure
+     *
+     * @param $key
+     * @param $value
+     * @return Api\Pb\Message\RpbPair
+     */
+    protected function toRpbPair($key, $value)
+    {
+        $pair = new Api\Pb\Message\RpbPair();
+        $pair->setKey($key);
+        $pair->setValue($value);
+
+        return $pair;
+    }
+
+    public function readMessageLength()
+    {
+        // read response message length
+        $array = unpack("N", stream_get_contents($this->connection, 4));
+        return $array[1];
+    }
+
+    public function readMessageCode()
+    {
+        // read response message code
+        $array = unpack("C", stream_get_contents($this->connection, 1));
+        return $array[1];
+    }
+
+    public function readMessage($length)
+    {
+        return stream_get_contents($this->connection, $length - 1);
+    }
+
+    /**
+     * @param $code
+     * @param string $payload
+     * @return string
+     */
+    protected function packMessage($code, $payload = '')
+    {
+        // https://github.com/basho/riak_pb#protocol
+        return pack("NC", 1 + strlen($payload), $code) . $payload;
     }
 }
