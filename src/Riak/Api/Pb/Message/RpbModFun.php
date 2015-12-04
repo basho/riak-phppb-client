@@ -13,7 +13,8 @@ class RpbModFun extends \ProtobufMessage
 {
     /* Field index constants */
     const MODULE = 1;
-    const FUNCTION = 2;
+    /* NOTE: FUNCTION is a reserved keyword and cannot be used as a constant, manual change */
+    const FUNC = 2;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -22,7 +23,7 @@ class RpbModFun extends \ProtobufMessage
             'required' => true,
             'type' => 7,
         ),
-        self::FUNCTION => array(
+        self::FUNC => array(
             'name' => 'function',
             'required' => true,
             'type' => 7,
@@ -47,7 +48,7 @@ class RpbModFun extends \ProtobufMessage
     public function reset()
     {
         $this->values[self::MODULE] = null;
-        $this->values[self::FUNCTION] = null;
+        $this->values[self::FUNC] = null;
     }
 
     /**
@@ -91,7 +92,7 @@ class RpbModFun extends \ProtobufMessage
      */
     public function setFunction($value)
     {
-        return $this->set(self::FUNCTION, $value);
+        return $this->set(self::FUNC, $value);
     }
 
     /**
@@ -101,7 +102,7 @@ class RpbModFun extends \ProtobufMessage
      */
     public function getFunction()
     {
-        return $this->get(self::FUNCTION);
+        return $this->get(self::FUNC);
     }
 }
 }

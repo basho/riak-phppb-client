@@ -363,6 +363,21 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::RpbSetBucketResp:
                 $this->response = new Command\Response($this->success, $code, '');
                 break;
+            case Api\Pb\Message::RpbGetBucketResp:
+                $code = 200;
+                $pbResponse = new Api\Pb\Message\RpbGetBucketResp();
+                $pbResponse->parseFromString($message);
+                $pbProps = $pbResponse->getProps();
+
+                $props = [];
+                foreach ($pbProps->fields() as $field_position => $field_meta) {
+                    $props[$field_meta['name']] = $pbProps->get($field_position);
+                }
+
+                $bucket = new Bucket($this->command->getBucket()->getName(), $this->command->getBucket()->getType(), $props);
+
+                $this->response = new Command\Bucket\Response($this->success, $code, '', $bucket);
+                break;
             case Api\Pb\Message::DtUpdateResp:
                 $pbResponse = new Api\Pb\Message\DtUpdateResp();
                 $pbResponse->parseFromString($message);
