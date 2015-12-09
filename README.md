@@ -15,29 +15,29 @@ To see other clients available for use with Riak visit our
 5. [License and Authors](#license-and-authors)
 
 
-## Installation *TODO UPDATE*
+## Installation
 
 ### Dependencies
-* **Release 2.x.x** requires PHP 5.4+ and allegro/protobuf PHP extension (instructions below)
+* **Release 1.x.x** requires PHP 5.4+ and allegro/protobuf PHP extension (instructions below)
 
 ### Composer Install
 Run the following `composer` command:
 
 ```console
-$ composer require "basho/riak-pb": "2.0.*"
+$ composer require "basho/riak-pb": "1.0.*"
 ```
 
 Alternately, manually add the following to your `composer.json`, in the `require` section:
 
 ```javascript
 "require": {
-    "basho/riak-pb": "2.0.*"
+    "basho/riak-pb": "1.0.*"
 }
 ```
 
 And then run `composer update` to ensure the module is installed and all dependencies retrieved.
 
-Finally, you need to run the following commands to install the needed extension for PB support.
+Next, you need to run the following commands to install the needed extension for PB support.
 
 ```sh
 cd vendor/allegro/protobuf
@@ -45,8 +45,20 @@ phpize
 ./configure
 make
 make install
-# please add following line to your php.ini
-# extension=protobuf.so
+```
+
+Finally, you need to make sure the newly installed extension is being included with your PHP environment via the php.ini
+or a php configuration file (`*.conf`).
+
+```text
+extension=protobuf.so
+```
+
+You can confirm that it is enabled for the command line environment with the following command.
+
+```sh
+php -m | grep protobuf
+-- outputs: protobuf
 ```
 
 ## Documentation
@@ -57,11 +69,12 @@ A fully traversable version of the API documentation for this library can be fou
 ### Releases
 The release tags of this project have been aligned with the major & minor release versions of Riak. For example, if you are using version 1.4.9 of Riak, then you will want the latest 1.4.* version of this library.
 
-### Example Usage *TODO UPDATE*
+### Example Usage
 Below is a short example of using the client. More substantial sample code is available [in examples](/examples).
 ```php
 // lib classes are included via the Composer autoloader files
 use Basho\Riak;
+use Basho\Riak\Api\Pb;
 use Basho\Riak\Node;
 use Basho\Riak\Command;
 
@@ -71,7 +84,7 @@ $nodes = (new Node\Builder)
     ->buildCluster(['riak1.company.com', 'riak2.company.com', 'riak3.company.com',]);
 
 // instantiate the Riak client
-$riak = new Riak($nodes);
+$riak = new Riak($nodes, [], new Pb());
 
 // build a command to be executed against Riak
 $command = (new Command\Builder\StoreObject($riak))
