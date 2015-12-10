@@ -202,6 +202,28 @@ class Pb extends Api implements ApiInterface
             case 'Basho\Riak\Command\Indexes\Query':
                 $this->messageCode = Api\Pb\Message::RpbIndexReq;
                 $message = new Api\Pb\Message\RpbIndexReq();
+
+                /** @var Command\Indexes\Query $command */
+                $command = $this->command;
+                $message->setIndex($command->getIndexName());
+                $message->setQtype($command->isRangeQuery());
+                $message->setRangeMax($command->getUpperBound());
+                $message->setRangeMin($command->getLowerBound());
+                foreach ($command->getParameters() as $key => $value) {
+                    if ($key == 'max_results') {
+                        $message->setMaxResults($command->getParameter('max_results'));
+                    } elseif ($key == 'continuation') {
+                        $message->setContinuation($command->getParameter('continuation'));
+                    } elseif ($key == 'return_terms') {
+                        $message->setReturnTerms($command->getParameter('return_terms'));
+                    } elseif ($key == 'pagination_sort') {
+                        $message->setPaginationSort($command->getParameter('pagination_sort'));
+                    } elseif ($key == 'term_regex') {
+                        $message->setTermRegex($command->getParameter('term_regex'));
+                    } elseif ($key == 'timeout') {
+                        $message->setTimeout($command->getParameter('timeout'));
+                    }
+                }
                 break;
             case 'Basho\Riak\Command\Ping':
                 $this->messageCode = Api\Pb\Message::RpbPingReq;
@@ -314,9 +336,13 @@ class Pb extends Api implements ApiInterface
                         ->setContentEncoding($content->getContentEncoding())
                         ->setVclock($pbResponse->getVclock());
 
-                    // TODO: add index values
+                    foreach ($content->getIndexes() as $rpbPair) {
+                        $object->addValueToIndex($rpbPair->getKey(), $rpbPair->getValue());
+                    }
 
-                    // TODO: add user meta data
+                    foreach ($content->getUsermeta() as $meta) {
+                        $object->setMetaDataValue($meta->getKey(), $meta->getValue());
+                    }
 
                     $objects[] = $object;
                 }
@@ -343,9 +369,19 @@ class Pb extends Api implements ApiInterface
                         ->setContentEncoding($content->getContentEncoding())
                         ->setVclock($pbResponse->getVclock());
 
-                    // TODO: add index values
+                    foreach ($content->getIndexes() as $rpbPair) {
+                        $isIntIndex = Api\Http\Translator\SecondaryIndex::isIntIndex($rpbPair->getKey());
+                        if ($isIntIndex) {
+                            $value = intval($rpbPair->getValue());
+                        } else {
+                            $value = $rpbPair->getValue();
+                        }
+                        $object->addValueToIndex($rpbPair->getKey(), $value);
+                    }
 
-                    // TODO: add user meta data
+                    foreach ($content->getUsermeta() as $meta) {
+                        $object->setMetaDataValue($meta->getKey(), $meta->getValue());
+                    }
 
                     $objects[] = $object;
                 }
@@ -495,7 +531,7 @@ class Pb extends Api implements ApiInterface
                 var_dump($message);
                 $pbResponse->parseFromString($message);
 
-                $this->response = new Command\Search\Schema\Response($this->success, $code, '', $pbResponse->getSchema(), Http::CONTENT_TYPE_XML);
+                $this->response = new Command\Search\Schema\Response($this->success, $code, '', $pbResponse->getSchema()->getContent(), Http::CONTENT_TYPE_XML);
                 break;
             default:
                 throw new Api\Exception('Mishandled PB response.');
@@ -519,8 +555,10 @@ class Pb extends Api implements ApiInterface
         $content->setContentEncoding($command->getObject()->getContentEncoding());
 
         // append secondary indexes to the Content object
-        foreach ($command->getObject()->getIndexes() as $key => $value) {
-            $content->appendIndexes($this->toRpbPair($key, $value));
+        foreach ($command->getObject()->getIndexes() as $key => $values) {
+            foreach ($values as $value) {
+                $content->appendIndexes($this->toRpbPair($key, $value));
+            }
         }
 
         return $content;
