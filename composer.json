@@ -43,9 +43,9 @@
       "type": "package",
       "package": {
         "name": "basho/riak_pb",
-        "version": "2.0",
+        "version": "2.1",
         "dist": {
-          "url": "https://github.com/basho/riak_pb/archive/2.0.0.17.zip",
+          "url": "https://github.com/basho/riak_pb/archive/2.1.1.0.zip",
           "type": "zip"
         }
       }
@@ -58,9 +58,9 @@
     "ext-curl": "*"
   },
   "require-dev": {
-    "basho/riak_pb": "2.0",
+    "basho/riak_pb": "2.1",
     "phpunit/phpunit": "4.5.*",
     "apigen/apigen": "4.1.*",
-    "allegro/protobuf": "dev-composer"
+    "allegro/protobuf": "dev-master"
   }
 }
