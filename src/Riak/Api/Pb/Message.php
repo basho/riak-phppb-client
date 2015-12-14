@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: chrismancini
- * Date: 10/2/15
- * Time: 2:51 PM
- */
 
 namespace Basho\Riak\Api\Pb;
-
 
 class Message
 {
