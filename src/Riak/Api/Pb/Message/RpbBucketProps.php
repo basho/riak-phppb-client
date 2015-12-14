@@ -1,8 +1,8 @@
 <?php
 /**
- * Auto generated from riak.proto at 2015-08-19 22:45:58
+ * Auto generated from riak.proto at 2015-12-14 20:48:33
  *
- * riak.api.pb.messages package
+ * basho.riak.api.pb.message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {
@@ -39,6 +39,7 @@ class RpbBucketProps extends \ProtobufMessage
     const SEARCH_INDEX = 25;
     const DATATYPE = 26;
     const CONSISTENT = 27;
+    const WRITE_ONCE = 28;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -179,6 +180,11 @@ class RpbBucketProps extends \ProtobufMessage
             'required' => false,
             'type' => 8,
         ),
+        self::WRITE_ONCE => array(
+            'name' => 'write_once',
+            'required' => false,
+            'type' => 8,
+        ),
     );
 
     /**
@@ -225,6 +231,7 @@ class RpbBucketProps extends \ProtobufMessage
         $this->values[self::SEARCH_INDEX] = null;
         $this->values[self::DATATYPE] = null;
         $this->values[self::CONSISTENT] = null;
+        $this->values[self::WRITE_ONCE] = null;
     }
 
     /**
@@ -913,6 +920,28 @@ class RpbBucketProps extends \ProtobufMessage
     public function getConsistent()
     {
         return $this->get(self::CONSISTENT);
+    }
+
+    /**
+     * Sets value of 'write_once' property
+     *
+     * @param bool $value Property value
+     *
+     * @return null
+     */
+    public function setWriteOnce($value)
+    {
+        return $this->set(self::WRITE_ONCE, $value);
+    }
+
+    /**
+     * Returns value of 'write_once' property
+     *
+     * @return bool
+     */
+    public function getWriteOnce()
+    {
+        return $this->get(self::WRITE_ONCE);
     }
 }
 }

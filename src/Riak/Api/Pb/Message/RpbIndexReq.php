@@ -1,8 +1,8 @@
 <?php
 /**
- * Auto generated from riak_kv.proto at 2015-08-20 00:04:20
+ * Auto generated from riak_kv.proto at 2015-12-14 21:14:59
  *
- * riak.api.pb.messages package
+ * basho.riak.api.pb.message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {
@@ -26,6 +26,8 @@ class RpbIndexReq extends \ProtobufMessage
     const TYPE = 12;
     const TERM_REGEX = 13;
     const PAGINATION_SORT = 14;
+    const COVER_CONTEXT = 15;
+    const RETURN_BODY = 16;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -99,6 +101,16 @@ class RpbIndexReq extends \ProtobufMessage
             'required' => false,
             'type' => 8,
         ),
+        self::COVER_CONTEXT => array(
+            'name' => 'cover_context',
+            'required' => false,
+            'type' => 7,
+        ),
+        self::RETURN_BODY => array(
+            'name' => 'return_body',
+            'required' => false,
+            'type' => 8,
+        ),
     );
 
     /**
@@ -132,6 +144,8 @@ class RpbIndexReq extends \ProtobufMessage
         $this->values[self::TYPE] = null;
         $this->values[self::TERM_REGEX] = null;
         $this->values[self::PAGINATION_SORT] = null;
+        $this->values[self::COVER_CONTEXT] = null;
+        $this->values[self::RETURN_BODY] = null;
     }
 
     /**
@@ -450,6 +464,50 @@ class RpbIndexReq extends \ProtobufMessage
     public function getPaginationSort()
     {
         return $this->get(self::PAGINATION_SORT);
+    }
+
+    /**
+     * Sets value of 'cover_context' property
+     *
+     * @param string $value Property value
+     *
+     * @return null
+     */
+    public function setCoverContext($value)
+    {
+        return $this->set(self::COVER_CONTEXT, $value);
+    }
+
+    /**
+     * Returns value of 'cover_context' property
+     *
+     * @return string
+     */
+    public function getCoverContext()
+    {
+        return $this->get(self::COVER_CONTEXT);
+    }
+
+    /**
+     * Sets value of 'return_body' property
+     *
+     * @param bool $value Property value
+     *
+     * @return null
+     */
+    public function setReturnBody($value)
+    {
+        return $this->set(self::RETURN_BODY, $value);
+    }
+
+    /**
+     * Returns value of 'return_body' property
+     *
+     * @return bool
+     */
+    public function getReturnBody()
+    {
+        return $this->get(self::RETURN_BODY);
     }
 }
 }

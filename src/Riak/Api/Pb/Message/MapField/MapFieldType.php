@@ -1,8 +1,8 @@
 <?php
 /**
- * Auto generated from riak_dt.proto at 2015-08-20 00:04:26
+ * Auto generated from riak_dt.proto at 2015-12-14 21:17:16
  *
- * riak.api.pb.messages package
+ * basho.riak.api.pb.message package
  */
 namespace Basho\Riak\Api\Pb\Message\MapField {
 /**

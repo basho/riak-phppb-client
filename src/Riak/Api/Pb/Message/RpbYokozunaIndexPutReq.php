@@ -1,8 +1,8 @@
 <?php
 /**
- * Auto generated from riak_yokozuna.proto at 2015-08-20 00:06:02
+ * Auto generated from riak_yokozuna.proto at 2015-12-14 21:20:33
  *
- * riak.api.pb.messages package
+ * basho.riak.api.pb.message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {
@@ -13,6 +13,7 @@ class RpbYokozunaIndexPutReq extends \ProtobufMessage
 {
     /* Field index constants */
     const INDEX = 1;
+    const TIMEOUT = 2;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -20,6 +21,11 @@ class RpbYokozunaIndexPutReq extends \ProtobufMessage
             'name' => 'index',
             'required' => true,
             'type' => '\Basho\Riak\Api\Pb\Message\RpbYokozunaIndex'
+        ),
+        self::TIMEOUT => array(
+            'name' => 'timeout',
+            'required' => false,
+            'type' => 5,
         ),
     );
 
@@ -41,6 +47,7 @@ class RpbYokozunaIndexPutReq extends \ProtobufMessage
     public function reset()
     {
         $this->values[self::INDEX] = null;
+        $this->values[self::TIMEOUT] = null;
     }
 
     /**
@@ -73,6 +80,28 @@ class RpbYokozunaIndexPutReq extends \ProtobufMessage
     public function getIndex()
     {
         return $this->get(self::INDEX);
+    }
+
+    /**
+     * Sets value of 'timeout' property
+     *
+     * @param int $value Property value
+     *
+     * @return null
+     */
+    public function setTimeout($value)
+    {
+        return $this->set(self::TIMEOUT, $value);
+    }
+
+    /**
+     * Returns value of 'timeout' property
+     *
+     * @return int
+     */
+    public function getTimeout()
+    {
+        return $this->get(self::TIMEOUT);
     }
 }
 }

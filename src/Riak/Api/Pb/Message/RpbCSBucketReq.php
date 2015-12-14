@@ -1,8 +1,8 @@
 <?php
 /**
- * Auto generated from riak_kv.proto at 2015-08-20 00:04:20
+ * Auto generated from riak_kv.proto at 2015-12-14 21:14:59
  *
- * riak.api.pb.messages package
+ * basho.riak.api.pb.message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {
@@ -21,6 +21,7 @@ class RpbCSBucketReq extends \ProtobufMessage
     const MAX_RESULTS = 7;
     const TIMEOUT = 8;
     const TYPE = 9;
+    const COVER_CONTEXT = 10;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -71,6 +72,11 @@ class RpbCSBucketReq extends \ProtobufMessage
             'required' => false,
             'type' => 7,
         ),
+        self::COVER_CONTEXT => array(
+            'name' => 'cover_context',
+            'required' => false,
+            'type' => 7,
+        ),
     );
 
     /**
@@ -99,6 +105,7 @@ class RpbCSBucketReq extends \ProtobufMessage
         $this->values[self::MAX_RESULTS] = null;
         $this->values[self::TIMEOUT] = null;
         $this->values[self::TYPE] = null;
+        $this->values[self::COVER_CONTEXT] = null;
     }
 
     /**
@@ -307,6 +314,28 @@ class RpbCSBucketReq extends \ProtobufMessage
     public function getType()
     {
         return $this->get(self::TYPE);
+    }
+
+    /**
+     * Sets value of 'cover_context' property
+     *
+     * @param string $value Property value
+     *
+     * @return null
+     */
+    public function setCoverContext($value)
+    {
+        return $this->set(self::COVER_CONTEXT, $value);
+    }
+
+    /**
+     * Returns value of 'cover_context' property
+     *
+     * @return string
+     */
+    public function getCoverContext()
+    {
+        return $this->get(self::COVER_CONTEXT);
     }
 }
 }
