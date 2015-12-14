@@ -93,7 +93,7 @@ class Pb extends Api implements ApiInterface
                 $props = new Api\Pb\Message\RpbBucketProps();
 
                 foreach ($this->command->getData()['props'] as $prop => $value) {
-                    $method = 'set' . str_replace("_","",ucwords($prop, "_"));
+                    $method = 'set' . str_replace("_", "", ucwords($prop, "_"));
                     $props->{$method}($value);
                 }
                 $message->setProps($props);
@@ -178,17 +178,17 @@ class Pb extends Api implements ApiInterface
                         foreach ($value as $field) {
                             $message->appendFl($field);
                         }
-                    } elseif($key == 'q') {
+                    } elseif ($key == 'q') {
                         $message->setQ($value);
-                    } elseif($key == 'rows') {
+                    } elseif ($key == 'rows') {
                         $message->setRows($value);
-                    } elseif($key == 'start') {
+                    } elseif ($key == 'start') {
                         $message->setStart($value);
-                    } elseif($key == 'sort') {
+                    } elseif ($key == 'sort') {
                         $message->setSort($value);
-                    } elseif($key == 'fq') {
+                    } elseif ($key == 'fq') {
                         $message->setFilter($value);
-                    } elseif($key == 'df') {
+                    } elseif ($key == 'df') {
                         $message->setFilter($value);
                     }
                 }
@@ -285,7 +285,7 @@ class Pb extends Api implements ApiInterface
      *  404 = Not found
      *
      * @param $message_code     PB Message identifier @see Basho\Riak\Api\Pb\Message
-     * @param string $message   Binary message
+     * @param string $message Binary message
      * @throws Exception
      * @internal param string $response
      */
@@ -386,8 +386,11 @@ class Pb extends Api implements ApiInterface
                     $objects[] = $object;
                 }
 
-                if ($objects) {
+                $object_count = count($objects);
+                if ($object_count == 1) {
                     $code = 200;
+                } elseif ($object_count > 1) {
+                    $code = 300;
                 }
 
                 $this->response = new Command\Object\Response($this->success, $code, '', $location, $objects);
@@ -477,7 +480,6 @@ class Pb extends Api implements ApiInterface
                 $pbResponse->parseFromString($message);
 
                 while ($code === null) {
-                    $this->debug($pbResponse);
                     if (!$pbResponse->getDone()) {
                         // We haven't received all responses from Riak, merge the results
                         $results = array_merge($results, json_decode($pbResponse->getResponse()));
@@ -665,7 +667,8 @@ class Pb extends Api implements ApiInterface
         // TODO: RETURN_BODY, R, W, PR, PW, DW, N, etc
     }
 
-    protected function debug($value) {
+    protected function debug($value)
+    {
         if ($this->command->isVerbose()) {
             echo "\n" . print_r($value, true);
         }
