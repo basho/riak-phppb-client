@@ -113,6 +113,7 @@ class Pb extends Api implements ApiInterface
             case 'Basho\Riak\Command\Object\Store':
                 $this->messageCode = Api\Pb\Message::RpbPutReq;
                 $message = new Api\Pb\Message\RpbPutReq();
+                $message->setVclock($this->command->getObject()->getVclock());
                 $message->setContent($this->prepareContent());
                 break;
             case 'Basho\Riak\Command\Object\Delete':
@@ -530,7 +531,6 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::RpbYokozunaSchemaGetResp:
                 $code = 200;
                 $pbResponse = new Api\Pb\Message\RpbYokozunaSchemaGetResp();
-                var_dump($message);
                 $pbResponse->parseFromString($message);
 
                 $this->response = new Command\Search\Schema\Response($this->success, $code, '', $pbResponse->getSchema()->getContent(), Http::CONTENT_TYPE_XML);
