@@ -120,6 +120,10 @@ class Pb extends Api implements ApiInterface
                 $this->messageCode = Api\Pb\Message::RpbDelReq;
                 $message = new Api\Pb\Message\RpbDelReq();
                 break;
+            case 'Basho\Riak\Command\Object\FetchPreflist':
+                $this->messageCode = Api\Pb\Message::RpbGetBucketKeyPreflistReq;
+                $message = new Api\Pb\Message\RpbGetBucketKeyPreflistReq();
+                break;
             case 'Basho\Riak\Command\DataType\Counter\Fetch':
             case 'Basho\Riak\Command\DataType\Set\Fetch':
             case 'Basho\Riak\Command\DataType\Map\Fetch':
@@ -407,6 +411,27 @@ class Pb extends Api implements ApiInterface
                 }
 
                 $this->response = new Command\Object\Response($this->success, $code, '', $location, $objects);
+                break;
+            case Api\Pb\Message::RpbGetBucketKeyPreflistResp:
+                $code = 200;
+                $pbResponse = new Api\Pb\Message\RpbGetBucketKeyPreflistResp();
+                $pbResponse->parseFromString($message);
+
+                $items = [];
+                foreach ($pbResponse->getPreflist() as $preflistItem) {
+                    $item = new \stdClass();
+                    $item->node = $preflistItem->getNode();
+                    $item->partition = $preflistItem->getPartition();
+                    $item->primary = $preflistItem->getPrimary();
+
+                    $items[] = $item;
+                }
+
+                // for consistent interface with http
+                $preflist = new \stdClass();
+                $preflist->preflist = $items;
+
+                $this->response = new Command\Object\Response($this->success, $code, '', $location, [new Object($preflist)]);
                 break;
             /** @noinspection PhpMissingBreakStatementInspection */
             case Api\Pb\Message::RpbPingResp:
