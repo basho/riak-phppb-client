@@ -286,6 +286,7 @@ class Pb extends Api implements ApiInterface
      *  204 = Success, no content returned
      *  300 = Multiple choices
      *  404 = Not found
+     *  503 = Service Unavailable / Timeout
      *
      * @param $message_code     PB Message identifier @see Basho\Riak\Api\Pb\Message
      * @param string $message Binary message
@@ -698,9 +699,63 @@ class Pb extends Api implements ApiInterface
         }
     }
 
+    /**
+     * @param \ProtobufMessage|Api\Pb\Message\RpbGetReq|Api\Pb\Message\RpbPutReq $message
+     * @param Command $command
+     */
     protected function setOptionsOnMessage(\ProtobufMessage &$message, Command $command)
     {
-        // TODO: RETURN_BODY, R, W, PR, PW, DW, N, etc
+        if ($command->getParameter('n_val')) {
+            $message->setNVal($command->getParameter('n_val'));
+        }
+
+        if ($command->getParameter('r')) {
+            $message->setR($command->getParameter('r'));
+        }
+
+        if ($command->getParameter('w')) {
+            $message->setW($command->getParameter('w'));
+        }
+
+        if ($command->getParameter('pr')) {
+            $message->setPr($command->getParameter('pr'));
+        }
+
+        if ($command->getParameter('pw')) {
+            $message->setPw($command->getParameter('pw'));
+        }
+
+        if ($command->getParameter('dw')) {
+            $message->setDw($command->getParameter('dw'));
+        }
+
+        if ($command->getParameter('rw')) {
+            $message->setRw($command->getParameter('rw'));
+        }
+
+        if ($command->getParameter('basic_quorum')) {
+            $message->setBasicQuorum($command->getParameter('basic_quorum'));
+        }
+
+        if ($command->getParameter('notfound_ok')) {
+            $message->setNotfoundOk($command->getParameter('notfound_ok'));
+        }
+
+        if ($command->getParameter('if_modified')) {
+            $message->setIfModified($command->getParameter('if_modified'));
+        }
+
+        if ($command->getParameter('if_not_modified')) {
+            $message->setIfNotModified($command->getParameter('if_not_modified'));
+        }
+
+        if ($command->getParameter('return_body')) {
+            $message->setReturnBody($command->getParameter('return_body'));
+        }
+
+        if ($command->getParameter('sloppy_quorum')) {
+            $message->setSloppyQuorum($command->getParameter('sloppy_quorum'));
+        }
     }
 
     protected function debug($value)
