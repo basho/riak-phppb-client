@@ -269,6 +269,10 @@ class Pb extends Api implements ApiInterface
         }
 
         $length = $this->readMessageLength();
+        if ($length > 1000000000) {
+            throw new Api\Exception('Abnormally high message length detected, possible HTTP response, verify connection port.');
+        }
+
         $message_code = $this->readMessageCode();
         $message = $this->readMessage($length);
 
