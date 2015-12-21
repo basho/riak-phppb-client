@@ -12,16 +12,16 @@ use Basho\Tests\TestCase;
 class DataTypeTest extends TestCase
 {
     const COUNTER_INCREMENT = 1;
-    const SET_ADDS = ['Eichel', 'Ennis', 'Bogosian'];
-    const SET_REMOVES = ['Meyers', 'Miller', 'Zadarov'];
-    const MAP_UPDATES = [
-        'roster_set' => ['add_all' => self::SET_ADDS, 'remove_all' => self::SET_REMOVES],
+    protected static $setAdds = ['Eichel', 'Ennis', 'Bogosian'];
+    protected static $setRemoves = ['Meyers', 'Miller', 'Zadarov'];
+    protected static $mapUpdates = [
+        'roster_set' => ['add_all' => ['Eichel', 'Ennis', 'Bogosian'], 'remove_all' => ['Meyers', 'Miller', 'Zadarov']],
         'clinch_playoffs_flag' => false,
         'win_counter' => 1,
         'name_register' => 'Buffalo Sabres',
         'farm_team_map' => ['update' => ['name_register' => 'Rochester Americans', 'prospects_set' => ['add_all' => ['Rodrigues']]]],
     ];
-    const MAP_REMOVES = ['tank_mode_flag'];
+    protected static $mapRemoves = ['tank_mode_flag'];
 
     public function testCompKeyToAssoc()
     {
@@ -58,11 +58,11 @@ class DataTypeTest extends TestCase
 
     public function testBuildSetOp()
     {
-        $op = DataType::buildSetOp(static::SET_ADDS, static::SET_REMOVES, false);
+        $op = DataType::buildSetOp(static::$setAdds, static::$setRemoves, false);
 
         $this->setOpAssertions($op);
 
-        $op = DataType::buildSetOp(static::SET_ADDS, static::SET_REMOVES, true);
+        $op = DataType::buildSetOp(static::$setAdds, static::$setRemoves, true);
 
         $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\DtOp', $op);
         $this->setOpAssertions($op->getSetOp());
@@ -70,11 +70,11 @@ class DataTypeTest extends TestCase
 
     public function testBuildMapOp()
     {
-        $op = DataType::buildMapOp(static::MAP_UPDATES, static::MAP_REMOVES, false);
+        $op = DataType::buildMapOp(static::$mapUpdates, static::$mapRemoves, false);
 
         $this->mapOpAssertions($op);
 
-        $op = DataType::buildMapOp(static::MAP_UPDATES, static::MAP_REMOVES, true);
+        $op = DataType::buildMapOp(static::$mapUpdates, static::$mapRemoves, true);
 
         $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\DtOp', $op);
         $this->mapOpAssertions($op->getMapOp());
@@ -91,8 +91,8 @@ class DataTypeTest extends TestCase
         $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\SetOp', $op);
         $this->assertEquals(3, $op->getAddsCount());
         $this->assertEquals(3, $op->getRemovesCount());
-        $this->assertEquals(static::SET_ADDS, $op->getAdds());
-        $this->assertEquals(static::SET_REMOVES, $op->getRemoves());
+        $this->assertEquals(static::$setAdds, $op->getAdds());
+        $this->assertEquals(static::$setRemoves, $op->getRemoves());
     }
 
     public function mapOpAssertions(MapOp $op)
@@ -126,7 +126,7 @@ class DataTypeTest extends TestCase
         }
 
         foreach ($op->getRemoves() as $remove) {
-            $this->assertContains(DataType::mapFieldToCompKey($remove), static::MAP_REMOVES);
+            $this->assertContains(DataType::mapFieldToCompKey($remove), static::$mapRemoves);
         }
     }
 }
