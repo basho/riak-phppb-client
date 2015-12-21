@@ -66,9 +66,6 @@ php -m | grep protobuf
 
 A fully traversable version of the API documentation for this library can be found on [Github Pages](http://basho.github.io/riak-phppb-client).
 
-### Releases
-The release tags of this project have been aligned with the major & minor release versions of Riak. For example, if you are using version 1.4.9 of Riak, then you will want the latest 1.4.* version of this library.
-
 ### Example Usage
 Below is a short example of using the client. More substantial sample code is available [in examples](/examples).
 ```php
