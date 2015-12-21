@@ -210,13 +210,15 @@ class Pb extends Api implements ApiInterface
                 $message->setQtype($command->isRangeQuery());
                 $message->setRangeMax($command->getUpperBound());
                 $message->setRangeMin($command->getLowerBound());
+                $message->setKey($command->getMatchValue());
+
                 foreach ($command->getParameters() as $key => $value) {
                     if ($key == 'max_results') {
                         $message->setMaxResults($command->getParameter('max_results'));
                     } elseif ($key == 'continuation') {
                         $message->setContinuation($command->getParameter('continuation'));
-                    } elseif ($key == 'return_terms') {
-                        $message->setReturnTerms($command->getParameter('return_terms'));
+                    } elseif ($key == 'return_terms' && $command->getParameter('return_terms') == 'true') {
+                        $message->setReturnTerms(true);
                     } elseif ($key == 'pagination_sort') {
                         $message->setPaginationSort($command->getParameter('pagination_sort'));
                     } elseif ($key == 'term_regex') {
@@ -301,20 +303,25 @@ class Pb extends Api implements ApiInterface
                 $pbResponse->parseFromString($message);
                 $this->error = $pbResponse->getErrmsg();
 
-                // intercept error for malformed query
+                // intercept certain "errors" to provide consistent cross interface behavior
                 if (strpos($message, "Query unsuccessful") !== false) {
+                    // HTTP status code for bad request, consider it a request success
                     $code = 400;
                     $this->response = new Command\Search\Response($this->success, $code, '', null);
                     break;
-                }
-
-                // intercept notfound "error"
-                if (strpos($message, "notfound") !== false) {
+                } elseif (strpos($message, "timeout") !== false) {
+                    // set HTTP status code for service unaivalable, consider it a request success
+                    $code = 503;
+                    $this->response = new Command\Indexes\Response($this->success, $code, $this->error);
+                    break;
+                } elseif (strpos($message, "notfound") !== false) {
+                    // set HTTP status code for not found, consider it a request success
                     $code = 404;
                 } else {
                     $code = $pbResponse->getErrcode();
                     $this->success = false;
                 }
+
                 $this->response = new Command\Response($this->success, $code, $this->error);
                 break;
             case Api\Pb\Message::RpbPutResp:
@@ -534,6 +541,35 @@ class Pb extends Api implements ApiInterface
                 $pbResponse->parseFromString($message);
 
                 $this->response = new Command\Search\Schema\Response($this->success, $code, '', $pbResponse->getSchema()->getContent(), Http::CONTENT_TYPE_XML);
+                break;
+            case Api\Pb\Message::RpbIndexResp:
+                $code = 200;
+                $pbResponse = new Api\Pb\Message\RpbIndexResp();
+                $pbResponse->parseFromString($message);
+
+                // sane defaults
+                $results = [];
+                $termsReturned = false;
+                $continuation = null;
+                $done = true;
+
+                if ($pbResponse->getKeys()) {
+                    $results = $pbResponse->getKeys();
+                }
+
+                if ($pbResponse->getResultsCount()) {
+                    foreach ($pbResponse->getResults() as $result) {
+                        $results[] = [$result->getKey() => $result->getValue()];
+                    }
+                    $termsReturned = true;
+                }
+
+                if ($pbResponse->getContinuation()) {
+                    $continuation = $pbResponse->getContinuation();
+                    $done = false;
+                }
+
+                $this->response = new Command\Indexes\Response($this->success, $code, '', $results, $termsReturned, $continuation, $done);
                 break;
             default:
                 throw new Api\Exception('Mishandled PB response.');
