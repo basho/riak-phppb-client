@@ -52,7 +52,7 @@
     }
   ],
   "require": {
-    "basho/riak": "3.0.x-dev",
+    "basho/riak": "3.0.*",
     "php": ">=5.4",
     "ext-json": "*",
     "ext-curl": "*"
