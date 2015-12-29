@@ -490,7 +490,7 @@ class Pb extends Api implements ApiInterface
                 $pbResponse->parseFromString($message);
 
                 // if value is null, the DT couldn't be found
-                if (!empty($pbResponse->getValue())) {
+                if ($pbResponse->getValue()) {
                     switch ($pbResponse->getType()) {
                         case Api\Pb\Message\DtFetchResp\DataType::COUNTER:
                             $counter = new DataType\Counter($pbResponse->getValue()->getCounterValue());
