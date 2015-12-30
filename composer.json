@@ -55,12 +55,12 @@
     "basho/riak": "3.0.*",
     "php": ">=5.4",
     "ext-json": "*",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "allegro/protobuf": "dev-master"
   },
   "require-dev": {
     "basho/riak_pb": "2.1",
     "phpunit/phpunit": "4.5.*",
-    "apigen/apigen": "4.1.*",
-    "allegro/protobuf": "dev-master"
+    "apigen/apigen": "4.1.*"
   }
 }
