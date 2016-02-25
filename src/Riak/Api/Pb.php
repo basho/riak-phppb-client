@@ -236,6 +236,42 @@ class Pb extends Api implements ApiInterface
                 $this->messageCode = Api\Pb\Message::RpbPingReq;
                 $message = '';
                 break;
+            /** @noinspection PhpMissingBreakStatementInspection */
+            case 'Basho\Riak\Command\TimeSeries\DeleteRow':
+                $this->messageCode = Api\Pb\Message::TsDelReq;
+                $message = new Api\Pb\Message\TsDelReq();
+            case 'Basho\Riak\Command\TimeSeries\FetchRow':
+                if (!$message) {
+                    $this->messageCode = Api\Pb\Message::TsGetReq;
+                    $message = new Api\Pb\Message\TsGetReq();
+                }
+
+                /** @var $command Command\Builder\TimeSeries\FetchRow */
+                $command = $this->command;
+                $message->setTable($command->getTable());
+                foreach($command->getKey() as $cell) {
+                    $message->appendKey(Api\Pb\Translator\TimeSeries::toPbCell($cell));
+                }
+                break;
+            case 'Basho\Riak\Command\TimeSeries\StoreRows':
+                $this->messageCode = Api\Pb\Message::TsPutReq;
+                $message = new Api\Pb\Message\TsPutReq();
+
+                /** @var $command Command\Builder\TimeSeries\StoreRows */
+                $command = $this->command;
+                $message->setTable($command->getTable());
+                foreach($command->getRows() as $row) {
+                    $message->appendRows(Api\Pb\Translator\TimeSeries::toPbRow($row));
+                }
+                break;
+            case 'Basho\Riak\Command\TimeSeries\Query':
+                $this->messageCode = Api\Pb\Message::TsQueryReq;
+                $message = new Api\Pb\Message\TsQueryReq();
+
+                /** @var $command Command\Builder\TimeSeries\Query */
+                $command = $this->command;
+                $message->setQuery(Api\Pb\Translator\TimeSeries::toPbQuery($command->getQuery(),$command->getInterps()));
+                break;
             default:
                 throw new Api\Exception('Command is invalid.');
         }
@@ -319,7 +355,7 @@ class Pb extends Api implements ApiInterface
                     $this->response = new Command\Search\Response($this->success, $code, '', null);
                     break;
                 } elseif (strpos($message, "timeout") !== false) {
-                    // set HTTP status code for service unaivalable, consider it a request success
+                    // set HTTP status code for service unavailable, consider it a request success
                     $code = 503;
                     $this->response = new Command\Indexes\Response($this->success, $code, $this->error);
                     break;
@@ -601,6 +637,36 @@ class Pb extends Api implements ApiInterface
 
                 $this->response = new Command\Indexes\Response($this->success, $code, '', $results, $termsReturned, $continuation, $done);
                 break;
+            case Api\Pb\Message::TsDelResp:
+            case Api\Pb\Message::TsPutResp:
+                $this->success = true;
+
+                $this->response = new Command\Response($this->success, $code);
+                break;
+            case Api\Pb\Message::TsGetResp:
+                $this->success = true;
+                $pbResponse = new Api\Pb\Message\TsGetResp();
+                $pbResponse->parseFromString($message);
+
+                $rows = [];
+                foreach($pbResponse->getRows() as $row) {
+                    $rows[] = Api\Pb\Translator\TimeSeries::fromPbRow($row, $pbResponse->getColumns());
+                }
+
+                $this->response = new Command\TimeSeries\Response($this->success, $code, $rows);
+                break;
+            case Api\Pb\Message::TsQueryResp:
+                $this->success = true;
+                $pbResponse = new Api\Pb\Message\TsQueryResp();
+                $pbResponse->parseFromString($message);
+
+                $rows = [];
+                foreach($pbResponse->getRows() as $row) {
+                    $rows[] = Api\Pb\Translator\TimeSeries::fromPbRow($row, $pbResponse->getColumns());
+                }
+
+                $this->response = new Command\TimeSeries\Response($this->success, $code, $rows);
+                break;
             default:
                 throw new Api\Exception('Mishandled PB response.');
         }
@@ -729,7 +795,7 @@ class Pb extends Api implements ApiInterface
     }
 
     /**
-     * @param \ProtobufMessage|Api\Pb\Message\RpbGetReq|Api\Pb\Message\RpbPutReq $message
+     * @param \ProtobufMessage|Api\Pb\Message\RpbGetReq|Api\Pb\Message\RpbPutReq|Api\Pb\Message\RpbDelReq $message
      * @param Command $command
      */
     protected function setOptionsOnMessage(\ProtobufMessage &$message, Command $command)
@@ -784,6 +850,10 @@ class Pb extends Api implements ApiInterface
 
         if ($command->getParameter('sloppy_quorum')) {
             $message->setSloppyQuorum($command->getParameter('sloppy_quorum'));
+        }
+
+        if ($command->getParameter('timeout')) {
+            $message->setTimeout($command->getParameter('timeout'));
         }
     }
 
