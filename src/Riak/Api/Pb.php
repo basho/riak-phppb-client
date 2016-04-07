@@ -237,40 +237,40 @@ class Pb extends Api implements ApiInterface
                 $message = '';
                 break;
             /** @noinspection PhpMissingBreakStatementInspection */
-            case 'Basho\Riak\Command\TimeSeries\DeleteRow':
+            case 'Basho\Riak\Command\TimeSeries\Delete':
                 $this->messageCode = Api\Pb\Message::TsDelReq;
                 $message = new Api\Pb\Message\TsDelReq();
-            case 'Basho\Riak\Command\TimeSeries\FetchRow':
+            case 'Basho\Riak\Command\TimeSeries\Fetch':
                 if (!$message) {
                     $this->messageCode = Api\Pb\Message::TsGetReq;
                     $message = new Api\Pb\Message\TsGetReq();
                 }
 
-                /** @var $command Command\Builder\TimeSeries\FetchRow */
+                /** @var $command Command\TimeSeries\Fetch */
                 $command = $this->command;
                 $message->setTable($command->getTable());
-                foreach($command->getKey() as $cell) {
+                foreach($command->getData() as $cell) {
                     $message->appendKey(Api\Pb\Translator\TimeSeries::toPbCell($cell));
                 }
                 break;
-            case 'Basho\Riak\Command\TimeSeries\StoreRows':
+            case 'Basho\Riak\Command\TimeSeries\Store':
                 $this->messageCode = Api\Pb\Message::TsPutReq;
                 $message = new Api\Pb\Message\TsPutReq();
 
-                /** @var $command Command\Builder\TimeSeries\StoreRows */
+                /** @var $command Command\TimeSeries\Store */
                 $command = $this->command;
                 $message->setTable($command->getTable());
-                foreach($command->getRows() as $row) {
+                foreach($command->getData() as $row) {
                     $message->appendRows(Api\Pb\Translator\TimeSeries::toPbRow($row));
                 }
                 break;
-            case 'Basho\Riak\Command\TimeSeries\Query':
+            case 'Basho\Riak\Command\TimeSeries\Query\Fetch':
                 $this->messageCode = Api\Pb\Message::TsQueryReq;
                 $message = new Api\Pb\Message\TsQueryReq();
 
-                /** @var $command Command\Builder\TimeSeries\Query */
+                /** @var $command Command\TimeSeries\Query\Fetch */
                 $command = $this->command;
-                $message->setQuery(Api\Pb\Translator\TimeSeries::toPbQuery($command->getQuery(),$command->getInterps()));
+                $message->setQuery(Api\Pb\Translator\TimeSeries::toPbQuery($command->getData()['query'], $command->getData()['interpolations']));
                 break;
             default:
                 throw new Api\Exception('Command is invalid.');
@@ -641,7 +641,7 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::TsPutResp:
                 $this->success = true;
 
-                $this->response = new Command\Response($this->success, $code);
+                $this->response = new Command\TimeSeries\Response($this->success, $code, '');
                 break;
             case Api\Pb\Message::TsGetResp:
                 $this->success = true;
@@ -653,7 +653,7 @@ class Pb extends Api implements ApiInterface
                     $rows[] = Api\Pb\Translator\TimeSeries::fromPbRow($row, $pbResponse->getColumns());
                 }
 
-                $this->response = new Command\TimeSeries\Response($this->success, $code, $rows);
+                $this->response = new Command\TimeSeries\Response($this->success, count($rows) ? 200 : 404, '', $rows);
                 break;
             case Api\Pb\Message::TsQueryResp:
                 $this->success = true;
@@ -665,7 +665,7 @@ class Pb extends Api implements ApiInterface
                     $rows[] = Api\Pb\Translator\TimeSeries::fromPbRow($row, $pbResponse->getColumns());
                 }
 
-                $this->response = new Command\TimeSeries\Response($this->success, $code, $rows);
+                $this->response = new Command\TimeSeries\Query\Response($this->success, count($rows) ? 200 : 204, '', $rows);
                 break;
             default:
                 throw new Api\Exception('Mishandled PB response.');
