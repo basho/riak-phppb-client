@@ -1,39 +1,33 @@
 <?php
 /**
- * Auto generated from riak_kv.proto at 2016-05-06 13:12:31
+ * Auto generated from riak_ts.proto at 2016-05-06 13:12:19
  *
  * Basho\Riak\Api\Pb\Message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {
 /**
- * RpbCoverageReq message
+ * TsCoverageReq message
  */
-class RpbCoverageReq extends \ProtobufMessage
+class TsCoverageReq extends \ProtobufMessage
 {
     /* Field index constants */
-    const TYPE = 1;
-    const BUCKET = 2;
-    const MIN_PARTITIONS = 3;
-    const REPLACE_COVER = 4;
-    const UNAVAILABLE_COVER = 5;
+    const QUERY = 1;
+    const TABLE = 2;
+    const REPLACE_COVER = 3;
+    const UNAVAILABLE_COVER = 4;
 
     /* @var array Field descriptors */
     protected static $fields = array(
-        self::TYPE => array(
-            'name' => 'type',
+        self::QUERY => array(
+            'name' => 'query',
             'required' => false,
-            'type' => 7,
+            'type' => '\Basho\Riak\Api\Pb\Message\TsInterpolation'
         ),
-        self::BUCKET => array(
-            'name' => 'bucket',
+        self::TABLE => array(
+            'name' => 'table',
             'required' => true,
             'type' => 7,
-        ),
-        self::MIN_PARTITIONS => array(
-            'name' => 'min_partitions',
-            'required' => false,
-            'type' => 5,
         ),
         self::REPLACE_COVER => array(
             'name' => 'replace_cover',
@@ -64,9 +58,8 @@ class RpbCoverageReq extends \ProtobufMessage
      */
     public function reset()
     {
-        $this->values[self::TYPE] = null;
-        $this->values[self::BUCKET] = null;
-        $this->values[self::MIN_PARTITIONS] = null;
+        $this->values[self::QUERY] = null;
+        $this->values[self::TABLE] = null;
         $this->values[self::REPLACE_COVER] = null;
         $this->values[self::UNAVAILABLE_COVER] = array();
     }
@@ -82,69 +75,47 @@ class RpbCoverageReq extends \ProtobufMessage
     }
 
     /**
-     * Sets value of 'type' property
+     * Sets value of 'query' property
+     *
+     * @param \Basho\Riak\Api\Pb\Message\TsInterpolation $value Property value
+     *
+     * @return null
+     */
+    public function setQuery(\Basho\Riak\Api\Pb\Message\TsInterpolation $value)
+    {
+        return $this->set(self::QUERY, $value);
+    }
+
+    /**
+     * Returns value of 'query' property
+     *
+     * @return \Basho\Riak\Api\Pb\Message\TsInterpolation
+     */
+    public function getQuery()
+    {
+        return $this->get(self::QUERY);
+    }
+
+    /**
+     * Sets value of 'table' property
      *
      * @param string $value Property value
      *
      * @return null
      */
-    public function setType($value)
+    public function setTable($value)
     {
-        return $this->set(self::TYPE, $value);
+        return $this->set(self::TABLE, $value);
     }
 
     /**
-     * Returns value of 'type' property
+     * Returns value of 'table' property
      *
      * @return string
      */
-    public function getType()
+    public function getTable()
     {
-        return $this->get(self::TYPE);
-    }
-
-    /**
-     * Sets value of 'bucket' property
-     *
-     * @param string $value Property value
-     *
-     * @return null
-     */
-    public function setBucket($value)
-    {
-        return $this->set(self::BUCKET, $value);
-    }
-
-    /**
-     * Returns value of 'bucket' property
-     *
-     * @return string
-     */
-    public function getBucket()
-    {
-        return $this->get(self::BUCKET);
-    }
-
-    /**
-     * Sets value of 'min_partitions' property
-     *
-     * @param int $value Property value
-     *
-     * @return null
-     */
-    public function setMinPartitions($value)
-    {
-        return $this->set(self::MIN_PARTITIONS, $value);
-    }
-
-    /**
-     * Returns value of 'min_partitions' property
-     *
-     * @return int
-     */
-    public function getMinPartitions()
-    {
-        return $this->get(self::MIN_PARTITIONS);
+        return $this->get(self::TABLE);
     }
 
     /**

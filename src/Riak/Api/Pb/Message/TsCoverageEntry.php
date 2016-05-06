@@ -1,21 +1,21 @@
 <?php
 /**
- * Auto generated from riak_kv.proto at 2016-05-06 13:12:31
+ * Auto generated from riak_ts.proto at 2016-05-06 13:12:19
  *
  * Basho\Riak\Api\Pb\Message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {
 /**
- * RpbCoverageEntry message
+ * TsCoverageEntry message
  */
-class RpbCoverageEntry extends \ProtobufMessage
+class TsCoverageEntry extends \ProtobufMessage
 {
     /* Field index constants */
     const IP = 1;
     const PORT = 2;
-    const KEYSPACE_DESC = 3;
-    const COVER_CONTEXT = 4;
+    const COVER_CONTEXT = 3;
+    const RANGE = 4;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -29,15 +29,15 @@ class RpbCoverageEntry extends \ProtobufMessage
             'required' => true,
             'type' => 5,
         ),
-        self::KEYSPACE_DESC => array(
-            'name' => 'keyspace_desc',
-            'required' => false,
-            'type' => 7,
-        ),
         self::COVER_CONTEXT => array(
             'name' => 'cover_context',
             'required' => true,
             'type' => 7,
+        ),
+        self::RANGE => array(
+            'name' => 'range',
+            'required' => false,
+            'type' => '\Basho\Riak\Api\Pb\Message\TsRange'
         ),
     );
 
@@ -60,8 +60,8 @@ class RpbCoverageEntry extends \ProtobufMessage
     {
         $this->values[self::IP] = null;
         $this->values[self::PORT] = null;
-        $this->values[self::KEYSPACE_DESC] = null;
         $this->values[self::COVER_CONTEXT] = null;
+        $this->values[self::RANGE] = null;
     }
 
     /**
@@ -119,28 +119,6 @@ class RpbCoverageEntry extends \ProtobufMessage
     }
 
     /**
-     * Sets value of 'keyspace_desc' property
-     *
-     * @param string $value Property value
-     *
-     * @return null
-     */
-    public function setKeyspaceDesc($value)
-    {
-        return $this->set(self::KEYSPACE_DESC, $value);
-    }
-
-    /**
-     * Returns value of 'keyspace_desc' property
-     *
-     * @return string
-     */
-    public function getKeyspaceDesc()
-    {
-        return $this->get(self::KEYSPACE_DESC);
-    }
-
-    /**
      * Sets value of 'cover_context' property
      *
      * @param string $value Property value
@@ -160,6 +138,28 @@ class RpbCoverageEntry extends \ProtobufMessage
     public function getCoverContext()
     {
         return $this->get(self::COVER_CONTEXT);
+    }
+
+    /**
+     * Sets value of 'range' property
+     *
+     * @param \Basho\Riak\Api\Pb\Message\TsRange $value Property value
+     *
+     * @return null
+     */
+    public function setRange(\Basho\Riak\Api\Pb\Message\TsRange $value)
+    {
+        return $this->set(self::RANGE, $value);
+    }
+
+    /**
+     * Returns value of 'range' property
+     *
+     * @return \Basho\Riak\Api\Pb\Message\TsRange
+     */
+    public function getRange()
+    {
+        return $this->get(self::RANGE);
     }
 }
 }
