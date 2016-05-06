@@ -303,6 +303,11 @@ class Pb extends Api implements ApiInterface
 
         $packedMessage = $this->packMessage($this->messageCode, $message);
 
+        if ($this->connection === false) {
+            $this->connection = null;
+            return false;
+        }
+
         $written = fwrite($this->connection, $packedMessage);
         if (!$written) {
             throw new Api\Exception('Failed to write to socket.');
@@ -707,9 +712,9 @@ class Pb extends Api implements ApiInterface
         $protocol = $this->node->useTls() ? 'tls' : 'tcp';
         $socket = sprintf('%s://%s', $protocol, $this->node->getUri());
 
-        $this->connection = stream_socket_client($socket, $errNo, $errMsg, 30, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT);
-        if ($errNo) {
-            throw new Api\Exception($errNo . ' - ' . $errMsg);
+        $this->connection = @stream_socket_client($socket, $errNo, $errMsg, 30, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT);
+        if ($this->connection === false || $errNo) {
+            $this->error = $errNo . ' - ' . $errMsg;
         }
 
         return $this;

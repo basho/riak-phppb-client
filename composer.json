@@ -53,7 +53,7 @@
   ],
   "require": {
     "basho/riak": "dev-ts",
-    "php": ">=5.4",
+    "php": ">=5.5",
     "ext-json": "*",
     "ext-curl": "*",
     "allegro/protobuf": "dev-master"
