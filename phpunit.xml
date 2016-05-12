@@ -16,9 +16,6 @@
             <directory>tests/scenario</directory>
             <directory>vendor/basho/riak/tests/scenario</directory>
         </testsuite>
-        <testsuite name="TimeSeries">
-            <file>vendor/basho/riak/tests/functional/TimeSeriesOperationsTest.php</file>
-        </testsuite>
     </testsuites>
     <filter>
         <whitelist>
