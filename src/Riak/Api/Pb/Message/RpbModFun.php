@@ -1,8 +1,8 @@
 <?php
 /**
- * Auto generated from riak.proto at 2015-12-14 20:48:33
+ * Auto generated from riak.proto at 2016-05-06 13:12:07
  *
- * basho.riak.api.pb.message package
+ * Basho\Riak\Api\Pb\Message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {
@@ -13,8 +13,7 @@ class RpbModFun extends \ProtobufMessage
 {
     /* Field index constants */
     const MODULE = 1;
-    /* NOTE: FUNCTION is a reserved keyword and cannot be used as a constant, manual change */
-    const FUNC = 2;
+    const FUNCTION_FIELD = 2;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -23,7 +22,7 @@ class RpbModFun extends \ProtobufMessage
             'required' => true,
             'type' => 7,
         ),
-        self::FUNC => array(
+        self::FUNCTION_FIELD => array(
             'name' => 'function',
             'required' => true,
             'type' => 7,
@@ -48,7 +47,7 @@ class RpbModFun extends \ProtobufMessage
     public function reset()
     {
         $this->values[self::MODULE] = null;
-        $this->values[self::FUNC] = null;
+        $this->values[self::FUNCTION_FIELD] = null;
     }
 
     /**
@@ -92,7 +91,7 @@ class RpbModFun extends \ProtobufMessage
      */
     public function setFunction($value)
     {
-        return $this->set(self::FUNC, $value);
+        return $this->set(self::FUNCTION_FIELD, $value);
     }
 
     /**
@@ -102,7 +101,7 @@ class RpbModFun extends \ProtobufMessage
      */
     public function getFunction()
     {
-        return $this->get(self::FUNC);
+        return $this->get(self::FUNCTION_FIELD);
     }
 }
 }

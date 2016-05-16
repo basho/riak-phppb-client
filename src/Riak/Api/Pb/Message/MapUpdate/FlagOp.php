@@ -1,8 +1,8 @@
 <?php
 /**
- * Auto generated from riak_dt.proto at 2015-12-14 21:17:16
+ * Auto generated from riak_dt.proto at 2016-05-06 13:12:12
  *
- * basho.riak.api.pb.message package
+ * Basho\Riak\Api\Pb\Message package
  */
 namespace Basho\Riak\Api\Pb\Message\MapUpdate {
 /**

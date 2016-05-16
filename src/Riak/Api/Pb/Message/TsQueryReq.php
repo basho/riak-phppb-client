@@ -1,8 +1,8 @@
 <?php
 /**
- * Auto generated from riak_ts.proto at 2015-12-14 21:17:37
+ * Auto generated from riak_ts.proto at 2016-05-06 13:12:19
  *
- * basho.riak.api.pb.message package
+ * Basho\Riak\Api\Pb\Message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {
@@ -14,6 +14,7 @@ class TsQueryReq extends \ProtobufMessage
     /* Field index constants */
     const QUERY = 1;
     const STREAM = 2;
+    const COVER_CONTEXT = 3;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -27,6 +28,11 @@ class TsQueryReq extends \ProtobufMessage
             'name' => 'stream',
             'required' => false,
             'type' => 8,
+        ),
+        self::COVER_CONTEXT => array(
+            'name' => 'cover_context',
+            'required' => false,
+            'type' => 7,
         ),
     );
 
@@ -49,6 +55,7 @@ class TsQueryReq extends \ProtobufMessage
     {
         $this->values[self::QUERY] = null;
         $this->values[self::STREAM] = false;
+        $this->values[self::COVER_CONTEXT] = null;
     }
 
     /**
@@ -103,6 +110,28 @@ class TsQueryReq extends \ProtobufMessage
     public function getStream()
     {
         return $this->get(self::STREAM);
+    }
+
+    /**
+     * Sets value of 'cover_context' property
+     *
+     * @param string $value Property value
+     *
+     * @return null
+     */
+    public function setCoverContext($value)
+    {
+        return $this->set(self::COVER_CONTEXT, $value);
+    }
+
+    /**
+     * Returns value of 'cover_context' property
+     *
+     * @return string
+     */
+    public function getCoverContext()
+    {
+        return $this->get(self::COVER_CONTEXT);
     }
 }
 }

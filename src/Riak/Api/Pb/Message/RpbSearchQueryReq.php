@@ -1,8 +1,8 @@
 <?php
 /**
- * Auto generated from riak_search.proto at 2015-12-14 21:17:30
+ * Auto generated from riak_search.proto at 2016-05-06 13:12:23
  *
- * basho.riak.api.pb.message package
+ * Basho\Riak\Api\Pb\Message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {

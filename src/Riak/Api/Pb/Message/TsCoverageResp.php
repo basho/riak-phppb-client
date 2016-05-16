@@ -1,15 +1,15 @@
 <?php
 /**
- * Auto generated from riak_kv.proto at 2016-05-06 13:12:31
+ * Auto generated from riak_ts.proto at 2016-05-06 13:12:19
  *
  * Basho\Riak\Api\Pb\Message package
  */
 
 namespace Basho\Riak\Api\Pb\Message {
 /**
- * RpbCoverageResp message
+ * TsCoverageResp message
  */
-class RpbCoverageResp extends \ProtobufMessage
+class TsCoverageResp extends \ProtobufMessage
 {
     /* Field index constants */
     const ENTRIES = 1;
@@ -19,7 +19,7 @@ class RpbCoverageResp extends \ProtobufMessage
         self::ENTRIES => array(
             'name' => 'entries',
             'repeated' => true,
-            'type' => '\Basho\Riak\Api\Pb\Message\RpbCoverageEntry'
+            'type' => '\Basho\Riak\Api\Pb\Message\TsCoverageEntry'
         ),
     );
 
@@ -56,11 +56,11 @@ class RpbCoverageResp extends \ProtobufMessage
     /**
      * Appends value to 'entries' list
      *
-     * @param \Basho\Riak\Api\Pb\Message\RpbCoverageEntry $value Value to append
+     * @param \Basho\Riak\Api\Pb\Message\TsCoverageEntry $value Value to append
      *
      * @return null
      */
-    public function appendEntries(\Basho\Riak\Api\Pb\Message\RpbCoverageEntry $value)
+    public function appendEntries(\Basho\Riak\Api\Pb\Message\TsCoverageEntry $value)
     {
         return $this->append(self::ENTRIES, $value);
     }
@@ -78,7 +78,7 @@ class RpbCoverageResp extends \ProtobufMessage
     /**
      * Returns 'entries' list
      *
-     * @return \Basho\Riak\Api\Pb\Message\RpbCoverageEntry[]
+     * @return \Basho\Riak\Api\Pb\Message\TsCoverageEntry[]
      */
     public function getEntries()
     {
@@ -100,7 +100,7 @@ class RpbCoverageResp extends \ProtobufMessage
      *
      * @param int $offset Position in list
      *
-     * @return \Basho\Riak\Api\Pb\Message\RpbCoverageEntry
+     * @return \Basho\Riak\Api\Pb\Message\TsCoverageEntry
      */
     public function getEntriesAt($offset)
     {
