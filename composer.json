@@ -21,7 +21,7 @@
     {
       "name": "Christopher Mancini",
       "email": "cmancini@basho.com",
-      "homepage": "https://github.com/christophermancini",
+      "homepage": "https://github.com/basho",
       "role": "Lead Developer"
     }
   ],
@@ -37,18 +37,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/christophermancini/php-protobuf"
-    },
-    {
-      "type": "package",
-      "package": {
-        "name": "basho/riak_pb",
-        "version": "2.1.3.0",
-        "dist": {
-          "url": "https://github.com/basho/riak_pb/archive/2.1.3.0.zip",
-          "type": "zip"
-        }
-      }
+      "url": "https://github.com/basho/php-protobuf"
     }
   ],
   "require": {
@@ -59,7 +48,6 @@
     "allegro/protobuf": "dev-master"
   },
   "require-dev": {
-    "basho/riak_pb": "2.1.*",
     "phpunit/phpunit": "4.5.*",
     "apigen/apigen": "4.1.*"
   }

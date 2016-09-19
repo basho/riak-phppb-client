@@ -1,0 +1,3 @@
+[submodule "riak_pb"]
+	path = riak_pb
+	url = https://github.com/basho/riak_pb.git
