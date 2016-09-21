@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak.proto at 2016-09-19 10:16:32
+ * Auto generated from riak.proto at 2016-09-21 11:26:05
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -40,6 +40,7 @@ class RpbBucketProps extends \ProtobufMessage
     const DATATYPE = 26;
     const CONSISTENT = 27;
     const WRITE_ONCE = 28;
+    const HLL_PRECISION = 29;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -185,6 +186,11 @@ class RpbBucketProps extends \ProtobufMessage
             'required' => false,
             'type' => 8,
         ),
+        self::HLL_PRECISION => array(
+            'name' => 'hll_precision',
+            'required' => false,
+            'type' => 5,
+        ),
     );
 
     /**
@@ -232,6 +238,7 @@ class RpbBucketProps extends \ProtobufMessage
         $this->values[self::DATATYPE] = null;
         $this->values[self::CONSISTENT] = null;
         $this->values[self::WRITE_ONCE] = null;
+        $this->values[self::HLL_PRECISION] = null;
     }
 
     /**
@@ -942,6 +949,28 @@ class RpbBucketProps extends \ProtobufMessage
     public function getWriteOnce()
     {
         return $this->get(self::WRITE_ONCE);
+    }
+
+    /**
+     * Sets value of 'hll_precision' property
+     *
+     * @param int $value Property value
+     *
+     * @return null
+     */
+    public function setHllPrecision($value)
+    {
+        return $this->set(self::HLL_PRECISION, $value);
+    }
+
+    /**
+     * Returns value of 'hll_precision' property
+     *
+     * @return int
+     */
+    public function getHllPrecision()
+    {
+        return $this->get(self::HLL_PRECISION);
     }
 }
 }

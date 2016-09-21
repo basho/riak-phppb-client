@@ -71,7 +71,7 @@ class DataType
      * @param bool|false $returnAsDt
      * @return Pb\Message\DtOp|Pb\Message\HllOp
      */
-    public static function buildSetOp(array $adds, $returnAsDt = false)
+    public static function buildHllOp(array $adds, $returnAsDt = false)
     {
         $sop = new Pb\Message\HllOp();
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_dt.proto at 2016-09-19 10:16:32
+ * Auto generated from riak_dt.proto at 2016-09-21 11:26:05
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -17,6 +17,7 @@ class DtUpdateResp extends \ProtobufMessage
     const COUNTER_VALUE = 3;
     const SET_VALUE = 4;
     const MAP_VALUE = 5;
+    const HLL_VALUE = 6;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -45,6 +46,11 @@ class DtUpdateResp extends \ProtobufMessage
             'repeated' => true,
             'type' => '\Basho\Riak\Api\Pb\Message\MapEntry'
         ),
+        self::HLL_VALUE => array(
+            'name' => 'hll_value',
+            'required' => false,
+            'type' => 5,
+        ),
     );
 
     /**
@@ -69,6 +75,7 @@ class DtUpdateResp extends \ProtobufMessage
         $this->values[self::COUNTER_VALUE] = null;
         $this->values[self::SET_VALUE] = array();
         $this->values[self::MAP_VALUE] = array();
+        $this->values[self::HLL_VALUE] = null;
     }
 
     /**
@@ -273,6 +280,28 @@ class DtUpdateResp extends \ProtobufMessage
     public function getMapValueCount()
     {
         return $this->count(self::MAP_VALUE);
+    }
+
+    /**
+     * Sets value of 'hll_value' property
+     *
+     * @param int $value Property value
+     *
+     * @return null
+     */
+    public function setHllValue($value)
+    {
+        return $this->set(self::HLL_VALUE, $value);
+    }
+
+    /**
+     * Returns value of 'hll_value' property
+     *
+     * @return int
+     */
+    public function getHllValue()
+    {
+        return $this->get(self::HLL_VALUE);
     }
 }
 }

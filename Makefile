@@ -5,7 +5,6 @@ PROTOC = ./vendor/bin/protoc
 protogen:
 	mkdir -p src/Basho
 	mv -f src/Riak src/Basho/Riak
-	git submodule update --init
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak_dt.proto
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak_kv.proto
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak.proto

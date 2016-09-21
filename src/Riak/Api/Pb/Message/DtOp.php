@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_dt.proto at 2016-09-19 10:16:32
+ * Auto generated from riak_dt.proto at 2016-09-21 11:26:05
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -15,6 +15,7 @@ class DtOp extends \ProtobufMessage
     const COUNTER_OP = 1;
     const SET_OP = 2;
     const MAP_OP = 3;
+    const HLL_OP = 4;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -32,6 +33,11 @@ class DtOp extends \ProtobufMessage
             'name' => 'map_op',
             'required' => false,
             'type' => '\Basho\Riak\Api\Pb\Message\MapOp'
+        ),
+        self::HLL_OP => array(
+            'name' => 'hll_op',
+            'required' => false,
+            'type' => '\Basho\Riak\Api\Pb\Message\HllOp'
         ),
     );
 
@@ -55,6 +61,7 @@ class DtOp extends \ProtobufMessage
         $this->values[self::COUNTER_OP] = null;
         $this->values[self::SET_OP] = null;
         $this->values[self::MAP_OP] = null;
+        $this->values[self::HLL_OP] = null;
     }
 
     /**
@@ -131,6 +138,28 @@ class DtOp extends \ProtobufMessage
     public function getMapOp()
     {
         return $this->get(self::MAP_OP);
+    }
+
+    /**
+     * Sets value of 'hll_op' property
+     *
+     * @param \Basho\Riak\Api\Pb\Message\HllOp $value Property value
+     *
+     * @return null
+     */
+    public function setHllOp(\Basho\Riak\Api\Pb\Message\HllOp $value)
+    {
+        return $this->set(self::HLL_OP, $value);
+    }
+
+    /**
+     * Returns value of 'hll_op' property
+     *
+     * @return \Basho\Riak\Api\Pb\Message\HllOp
+     */
+    public function getHllOp()
+    {
+        return $this->get(self::HLL_OP);
     }
 }
 }

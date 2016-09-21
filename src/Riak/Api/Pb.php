@@ -555,7 +555,7 @@ class Pb extends Api implements ApiInterface
                             $this->response = new Command\DataType\Map\Response($this->success, $code, '', null, $map);
                             break;
                         case Api\Pb\Message\DtFetchResp\DataType::HLL:
-                            $hll = new DataType\Hll($pbResponse->getValue());
+                            $hll = new DataType\Hll($pbResponse->getValue()->getHllValue());
                             $this->response = new Command\DataType\Hll\Response($this->success, $code, '', null, $hll);
                             break;
                         default:
@@ -782,7 +782,7 @@ class Pb extends Api implements ApiInterface
     protected function buildHllUpdateMessage(array $adds = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->hllOp(Api\Pb\Translator\DataType::buildHllOp($adds, true));
+        $message->setOp(Api\Pb\Translator\DataType::buildHllOp($adds, true));
 
         return $message;
     }
