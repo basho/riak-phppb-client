@@ -215,6 +215,8 @@ class Pb extends Api implements ApiInterface
                 $message->setRangeMax($command->getUpperBound());
                 $message->setRangeMin($command->getLowerBound());
                 $message->setKey($command->getMatchValue());
+                # TODO: when streaming is implemented
+                # $message->setStream($command->getStreamValue());
 
                 foreach ($command->getParameters() as $key => $value) {
                     if ($key == 'max_results') {
