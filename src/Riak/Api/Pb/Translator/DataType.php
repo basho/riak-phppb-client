@@ -65,6 +65,31 @@ class DataType
     }
 
     /**
+     * Builds the Protobuff proto Op object for Hlls
+     *
+     * @param array $adds
+     * @param bool|false $returnAsDt
+     * @return Pb\Message\DtOp|Pb\Message\HllOp
+     */
+    public static function buildSetOp(array $adds, $returnAsDt = false)
+    {
+        $sop = new Pb\Message\HllOp();
+
+        foreach ($adds as $add) {
+            $sop->appendAdds($add);
+        }
+
+        if ($returnAsDt) {
+            $op = new Pb\Message\DtOp();
+            $op->setHllOp($sop);
+
+            return $op;
+        }
+
+        return $sop;
+    }
+
+    /**
      * Builds the Protobuff proto Op object for Maps
      *
      * @param array $updates
