@@ -127,6 +127,7 @@ class Pb extends Api implements ApiInterface
             case 'Basho\Riak\Command\DataType\Counter\Fetch':
             case 'Basho\Riak\Command\DataType\Set\Fetch':
             case 'Basho\Riak\Command\DataType\Map\Fetch':
+            case 'Basho\Riak\Command\DataType\Hll\Fetch':
                 $this->messageCode = Api\Pb\Message::DtFetchReq;
                 $message = new Api\Pb\Message\DtFetchReq();
                 break;
@@ -140,6 +141,10 @@ class Pb extends Api implements ApiInterface
             case 'Basho\Riak\Command\DataType\Map\Store':
                 $data = $this->command->getData();
                 $message = $this->buildMapUpdateMessage($data['update'], !empty($data['remove']) ? $data['remove'] : []);
+                break;
+            case 'Basho\Riak\Command\DataType\Hll\Store':
+                $data = $this->command->getData();
+                $message = $this->buildHllUpdateMessage($data['add_all']);
                 break;
             case 'Basho\Riak\Command\Search\Index\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbYokozunaIndexGetReq;
@@ -524,6 +529,8 @@ class Pb extends Api implements ApiInterface
                         $this->response = new Command\DataType\Set\Response($this->success, $code, '', $location);
                     } elseif ($command == 'Basho\Riak\Command\DataType\Map\Store') {
                         $this->response = new Command\DataType\Map\Response($this->success, $code, '', $location);
+                    } elseif ($command == 'Basho\Riak\Command\DataType\Hll\Store') {
+                        $this->response = new Command\DataType\Hll\Response($this->success, $code, '', $location);
                     }
                 }
                 break;
@@ -546,6 +553,10 @@ class Pb extends Api implements ApiInterface
                         case Api\Pb\Message\DtFetchResp\DataType::MAP:
                             $map = new DataType\Map(Api\Pb\Translator\DataType::mapEntriesToArray($pbResponse->getValue()->getMapValue()), $pbResponse->getContext());
                             $this->response = new Command\DataType\Map\Response($this->success, $code, '', null, $map);
+                            break;
+                        case Api\Pb\Message\DtFetchResp\DataType::HLL:
+                            $hll = new DataType\Hll($pbResponse->getValue()->getHllValue());
+                            $this->response = new Command\DataType\Hll\Response($this->success, $code, '', null, $hll);
                             break;
                         default:
                             throw new Exception('Unknown data type.');
@@ -760,6 +771,18 @@ class Pb extends Api implements ApiInterface
     {
         $message = $this->buildDataTypeMessage();
         $message->setOp(Api\Pb\Translator\DataType::buildSetOp($adds, $removes, true));
+
+        return $message;
+    }
+
+    /**
+     * @param array $adds
+     * @return Pb\Message\DtUpdateReq
+     */
+    protected function buildHllUpdateMessage(array $adds = [])
+    {
+        $message = $this->buildDataTypeMessage();
+        $message->setOp(Api\Pb\Translator\DataType::buildHllOp($adds, true));
 
         return $message;
     }

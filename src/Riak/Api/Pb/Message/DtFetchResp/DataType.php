@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_dt.proto at 2016-09-19 10:16:32
+ * Auto generated from riak_dt.proto at 2016-09-21 11:26:05
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -13,6 +13,7 @@ final class DataType
     const COUNTER = 1;
     const SET = 2;
     const MAP = 3;
+    const HLL = 4;
 
     /**
      * Returns defined enum values
@@ -25,6 +26,7 @@ final class DataType
             'COUNTER' => self::COUNTER,
             'SET' => self::SET,
             'MAP' => self::MAP,
+            'HLL' => self::HLL,
         );
     }
 }
