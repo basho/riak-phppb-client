@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_yokozuna.proto at 2016-09-21 11:26:05
+ * Auto generated from riak_yokozuna.proto at 2016-09-24 09:49:42
  *
  * Basho\Riak\Api\Pb\Message package
  */
