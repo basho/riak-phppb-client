@@ -20,7 +20,7 @@ class HttpResponseTest extends TestCase
         // configure with HTTP port
         $node = (new Riak\Node\Builder)
             ->atHost(static::getTestHost())
-            ->onPort(static::TEST_NODE_HTTP_PORT)
+            ->onPort(static::getTestHttpPort())
             ->build();
 
         $riak = new Riak([$node], [], static::getApiBridgeClass());
