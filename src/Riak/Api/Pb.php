@@ -913,20 +913,27 @@ class Pb extends Api implements ApiInterface
     public function readMessageLength()
     {
         // read response message length
-        $array = unpack("N", stream_get_contents($this->connection, 4));
+        $array = unpack("N", $this->readBytes(4));
         return $array[1];
     }
 
     public function readMessageCode()
     {
         // read response message code
-        $array = unpack("C", stream_get_contents($this->connection, 1));
+        $array = unpack("C", $this->readBytes(1));
         return $array[1];
     }
 
     public function readMessage($length)
     {
-        return stream_get_contents($this->connection, $length - 1);
+        $msglen = $length - 1;
+        if ($msglen == 0) {
+            // NB: this is a message-code only message
+            // so no message body
+            return;
+        } else {
+            return $this->readBytes($msglen);
+        }
     }
 
     /**
@@ -938,5 +945,21 @@ class Pb extends Api implements ApiInterface
     {
         // https://github.com/basho/riak_pb#protocol
         return pack("NC", 1 + strlen($payload), $code) . $payload;
+    }
+
+    /**
+     * @param integer $length
+     * @return string
+     */
+    private function readBytes($length)
+    {
+        $bin = stream_get_contents($this->connection, $length);
+        if ($bin == FALSE) {
+            throw new Api\Exception("expected to read $length bytes, stream_get_contents() returned FALSE");
+        }
+        if (strlen($bin) != $length) {
+            throw new Api\Exception("expected to read $length bytes, read " . sizeof($bin));
+        }
+        return $bin;
     }
 }
