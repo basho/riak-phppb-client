@@ -1,5 +1,7 @@
 # Riak PB Client for PHP
 
+[![Packagist](https://img.shields.io/packagist/v/basho/riak-pb.svg?maxAge=2592000)](https://packagist.org/packages/basho/riak-pb)
+
 **Riak PHP PB Client** is a client which makes it easy to communicate with [Riak](http://basho.com/riak/), an open source, distributed database that focuses on high availability, horizontal scalability, and *predictable*
 latency. Both Riak and this code is maintained by [Basho](http://www.basho.com/).
 
