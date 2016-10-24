@@ -2,17 +2,20 @@
 
 <phpunit colors="true">
     <testsuites>
-        <testsuite name="Unit Tests">
+        <testsuite name="unit-tests">
             <directory>tests/unit</directory>
             <directory>vendor/basho/riak/tests/unit</directory>
         </testsuite>
-        <testsuite name="Functional Tests">
+        <testsuite name="functional-tests">
             <directory>tests/functional</directory>
             <directory>vendor/basho/riak/tests/functional</directory>
             <exclude>vendor/basho/riak/tests/functional/SecurityFeaturesTest.php</exclude>
             <exclude>vendor/basho/riak/tests/functional/TimeSeriesOperationsTest.php</exclude>
         </testsuite>
-        <testsuite name="Scenario Tests">
+        <testsuite name="security-tests">
+            <file>vendor/basho/riak/tests/functional/SecurityFeaturesTest.php</file>
+        </testsuite>
+        <testsuite name="scenario-tests">
             <directory>tests/scenario</directory>
             <directory>vendor/basho/riak/tests/scenario</directory>
         </testsuite>
