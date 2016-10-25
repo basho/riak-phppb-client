@@ -430,6 +430,7 @@ class Pb extends Api implements ApiInterface
 
                     $object = (new Object)
                         ->setData($command->getDecodedData($content->getValue(), $content->getContentType()))
+                        ->setRawData($content->getValue())
                         ->setContentType($content->getContentType())
                         ->setContentEncoding($content->getContentEncoding())
                         ->setVclock($pbResponse->getVclock());
