@@ -41,7 +41,7 @@
     }
   ],
   "require": {
-    "basho/riak": "dev-develop",
+    "basho/riak": "dev-features/lrb/remove-buildbot",
     "php": ">=5.5",
     "ext-json": "*",
     "ext-curl": "*",
