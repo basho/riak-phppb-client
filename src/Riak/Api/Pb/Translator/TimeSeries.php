@@ -83,9 +83,11 @@ class TimeSeries
     {
         $tsRow = new TsRow();
 
+        $cells = [];
         foreach($row as $cell) {
-            $tsRow->appendCells(static::toPbCell($cell));
+            $cells[] = static::toPbCell($cell);
         }
+        $tsRow->setCells($cells);
 
         return $tsRow;
     }
