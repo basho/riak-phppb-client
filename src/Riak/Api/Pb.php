@@ -965,7 +965,7 @@ class Pb extends Api implements ApiInterface
         $bin = stream_get_contents($this->connection, $length);
         if ($bin == FALSE) {
             $md = stream_get_meta_data($this->connection);
-            $info = implode($md, ", ");
+            $info = print_r($md, true);
             throw new Api\Exception("expected to read $length bytes, stream_get_contents() returned FALSE. Info: " . $info);
         }
         if (strlen($bin) != $length) {
