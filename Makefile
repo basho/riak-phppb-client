@@ -1,6 +1,6 @@
 .PHONY: all unit-test integration-test security-test
 .PHONY: install-deps install-composer install-protobuf help
-.PHONY: protogen
+.PHONY: protogen release
 
 export PB_INTERFACE = 1
 
@@ -56,6 +56,18 @@ endif
 	mv -f src/Basho/Riak src/Riak
 	rm -rf src/Basho
 	rm -f pb_proto_riak.php
+
+release:
+ifeq ($(VERSION),)
+	$(error VERSION must be set to deploy this code)
+endif
+ifeq ($(RELEASE_GPG_KEYNAME),)
+	$(error RELEASE_GPG_KEYNAME must be set to deploy this code)
+endif
+	@./tools/build/publish $(VERSION) master validate
+	@git tag --sign -a "$(VERSION)" -m "riak-phppb-client $(VERSION)" --local-user "$(RELEASE_GPG_KEYNAME)"
+	@git push --tags
+	@./tools/build/publish $(VERSION) master 'Riak PHP PB Client' 'riak-phppb-client'
 
 help:
 	@echo ''
