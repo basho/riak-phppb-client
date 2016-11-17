@@ -41,7 +41,7 @@
     }
   ],
   "require": {
-    "basho/riak": "dev-fixes/lrb/add-socket-timeouts",
+    "basho/riak": "^3.2",
     "php": ">=5.5",
     "ext-json": "*",
     "ext-curl": "*",
