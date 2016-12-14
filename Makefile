@@ -23,9 +23,15 @@ security-test:
 install-deps: install-composer
 	@./composer install
 
+timeseries-test:
+	@php ./vendor/bin/phpunit vendor/basho/riak/tests/functional/TimeSeriesOperationsTest.php
+
 install-composer: composer
 
 install-protobuf: install-deps
+ifeq (,$(findstring php-5.6.,$(PHP_VERSION)))
+	$(error protogen target should be run with PHP version 5.6.X instead of $(PHP_VERSION))
+endif
 	cd vendor/allegro/protobuf && \
 		phpize && \
 		./configure && \
@@ -42,9 +48,6 @@ composer:
 	@rm -f ./composer-setup.php
 
 protogen:
-ifeq (,$(findstring php-5.6.,$(PHP_VERSION)))
-	$(error protogen target should be run with PHP version 5.6.X instead of $(PHP_VERSION))
-endif
 	mkdir -p src/Basho
 	mv -f src/Riak src/Basho/Riak
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak_dt.proto

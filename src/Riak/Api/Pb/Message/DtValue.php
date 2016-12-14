@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_dt.proto at 2016-09-24 09:49:42
+ * Auto generated from riak_dt.proto at 2016-12-13 21:45:39
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -16,6 +16,7 @@ class DtValue extends \ProtobufMessage
     const SET_VALUE = 2;
     const MAP_VALUE = 3;
     const HLL_VALUE = 4;
+    const GSET_VALUE = 5;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -38,6 +39,11 @@ class DtValue extends \ProtobufMessage
             'name' => 'hll_value',
             'required' => false,
             'type' => 5,
+        ),
+        self::GSET_VALUE => array(
+            'name' => 'gset_value',
+            'repeated' => true,
+            'type' => 7,
         ),
     );
 
@@ -62,6 +68,7 @@ class DtValue extends \ProtobufMessage
         $this->values[self::SET_VALUE] = array();
         $this->values[self::MAP_VALUE] = array();
         $this->values[self::HLL_VALUE] = null;
+        $this->values[self::GSET_VALUE] = array();
     }
 
     /**
@@ -244,6 +251,70 @@ class DtValue extends \ProtobufMessage
     public function getHllValue()
     {
         return $this->get(self::HLL_VALUE);
+    }
+
+    /**
+     * Appends value to 'gset_value' list
+     *
+     * @param string $value Value to append
+     *
+     * @return null
+     */
+    public function appendGsetValue($value)
+    {
+        return $this->append(self::GSET_VALUE, $value);
+    }
+
+    /**
+     * Clears 'gset_value' list
+     *
+     * @return null
+     */
+    public function clearGsetValue()
+    {
+        return $this->clear(self::GSET_VALUE);
+    }
+
+    /**
+     * Returns 'gset_value' list
+     *
+     * @return string[]
+     */
+    public function getGsetValue()
+    {
+        return $this->get(self::GSET_VALUE);
+    }
+
+    /**
+     * Returns 'gset_value' iterator
+     *
+     * @return ArrayIterator
+     */
+    public function getGsetValueIterator()
+    {
+        return new \ArrayIterator($this->get(self::GSET_VALUE));
+    }
+
+    /**
+     * Returns element from 'gset_value' list at given offset
+     *
+     * @param int $offset Position in list
+     *
+     * @return string
+     */
+    public function getGsetValueAt($offset)
+    {
+        return $this->get(self::GSET_VALUE, $offset);
+    }
+
+    /**
+     * Returns count of 'gset_value' list
+     *
+     * @return int
+     */
+    public function getGsetValueCount()
+    {
+        return $this->count(self::GSET_VALUE);
     }
 }
 }

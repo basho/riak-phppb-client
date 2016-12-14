@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_ts.proto at 2016-09-24 09:49:42
+ * Auto generated from riak_ts.proto at 2016-12-13 21:45:39
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -15,6 +15,7 @@ final class TsColumnType
     const DOUBLE = 2;
     const TIMESTAMP = 3;
     const BOOLEAN = 4;
+    const BLOB = 5;
 
     /**
      * Returns defined enum values
@@ -29,6 +30,7 @@ final class TsColumnType
             'DOUBLE' => self::DOUBLE,
             'TIMESTAMP' => self::TIMESTAMP,
             'BOOLEAN' => self::BOOLEAN,
+            'BLOB' => self::BLOB,
         );
     }
 }

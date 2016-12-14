@@ -56,6 +56,9 @@ class TimeSeries
             case TsColumnType::BOOLEAN:
                 $cell->setBooleanValue($tsCell->getBooleanValue());
                 break;
+            case TsColumnType::BLOB:
+                $cell->setBlobValue($tsCell->getVarcharValue());
+                break;
             case TsColumnType::SINT64:
                 $cell->setIntValue($tsCell->getSint64Value());
                 break;
