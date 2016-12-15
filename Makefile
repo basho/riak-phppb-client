@@ -9,7 +9,7 @@ PHP_VERSION := $(shell php -r 'echo "php-";echo phpversion();')
 
 all: test
 
-test: unit-test integration-test
+test: unit-test integration-test scenario-test
 
 unit-test:
 	@php ./vendor/bin/phpunit --testsuite=unit-tests
@@ -17,11 +17,17 @@ unit-test:
 integration-test:
 	@php ./vendor/bin/phpunit --testsuite=functional-tests
 
+scenario-test:
+	@php ./vendor/bin/phpunit  --testsuite=scenario-tests
+
 security-test:
 	@php ./vendor/bin/phpunit --testsuite=security-tests
 
 install-deps: install-composer
 	@./composer install
+
+timeseries-test:
+	@php ./vendor/bin/phpunit vendor/basho/riak/tests/functional/TimeSeriesOperationsTest.php
 
 install-composer: composer
 
@@ -42,9 +48,6 @@ composer:
 	@rm -f ./composer-setup.php
 
 protogen:
-ifeq (,$(findstring php-5.6.,$(PHP_VERSION)))
-	$(error protogen target should be run with PHP version 5.6.X instead of $(PHP_VERSION))
-endif
 	mkdir -p src/Basho
 	mv -f src/Riak src/Basho/Riak
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak_dt.proto

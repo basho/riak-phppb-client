@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_dt.proto at 2016-09-24 09:49:42
+ * Auto generated from riak_dt.proto at 2016-12-13 21:45:39
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -16,6 +16,7 @@ class DtOp extends \ProtobufMessage
     const SET_OP = 2;
     const MAP_OP = 3;
     const HLL_OP = 4;
+    const GSET_OP = 5;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -38,6 +39,11 @@ class DtOp extends \ProtobufMessage
             'name' => 'hll_op',
             'required' => false,
             'type' => '\Basho\Riak\Api\Pb\Message\HllOp'
+        ),
+        self::GSET_OP => array(
+            'name' => 'gset_op',
+            'required' => false,
+            'type' => '\Basho\Riak\Api\Pb\Message\GSetOp'
         ),
     );
 
@@ -62,6 +68,7 @@ class DtOp extends \ProtobufMessage
         $this->values[self::SET_OP] = null;
         $this->values[self::MAP_OP] = null;
         $this->values[self::HLL_OP] = null;
+        $this->values[self::GSET_OP] = null;
     }
 
     /**
@@ -160,6 +167,28 @@ class DtOp extends \ProtobufMessage
     public function getHllOp()
     {
         return $this->get(self::HLL_OP);
+    }
+
+    /**
+     * Sets value of 'gset_op' property
+     *
+     * @param \Basho\Riak\Api\Pb\Message\GSetOp $value Property value
+     *
+     * @return null
+     */
+    public function setGsetOp(\Basho\Riak\Api\Pb\Message\GSetOp $value)
+    {
+        return $this->set(self::GSET_OP, $value);
+    }
+
+    /**
+     * Returns value of 'gset_op' property
+     *
+     * @return \Basho\Riak\Api\Pb\Message\GSetOp
+     */
+    public function getGsetOp()
+    {
+        return $this->get(self::GSET_OP);
     }
 }
 }
