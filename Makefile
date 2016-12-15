@@ -9,13 +9,16 @@ PHP_VERSION := $(shell php -r 'echo "php-";echo phpversion();')
 
 all: test
 
-test: unit-test integration-test
+test: unit-test integration-test scenario-test
 
 unit-test:
 	@php ./vendor/bin/phpunit --testsuite=unit-tests
 
 integration-test:
 	@php ./vendor/bin/phpunit --testsuite=functional-tests
+
+scenario-test:
+	@php ./vendor/bin/phpunit  --testsuite=scenario-tests
 
 security-test:
 	@php ./vendor/bin/phpunit --testsuite=security-tests
