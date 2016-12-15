@@ -34,6 +34,11 @@ class TimeSeries
             case Cell::BOOL_TYPE:
                 $tsCell->setBooleanValue($cell->getValue());
                 break;
+            case Cell::BLOB_TYPE:
+                if (is_null($cell->getValue())) {
+                    $tsCell->setVarcharValue('');
+                    break;
+                }
             default:
                 $tsCell->setVarcharValue($cell->getValue());
         }
