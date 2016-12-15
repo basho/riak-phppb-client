@@ -29,9 +29,6 @@ timeseries-test:
 install-composer: composer
 
 install-protobuf: install-deps
-ifeq (,$(findstring php-5.6.,$(PHP_VERSION)))
-	$(error protogen target should be run with PHP version 5.6.X instead of $(PHP_VERSION))
-endif
 	cd vendor/allegro/protobuf && \
 		phpize && \
 		./configure && \
