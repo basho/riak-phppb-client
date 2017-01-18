@@ -438,6 +438,7 @@ class Pb extends Api implements ApiInterface
 
                     $object = (new Object)
                         ->setData($command->getDecodedData($content->getValue(), $content->getContentType()))
+                        ->setRawData($content->getValue())
                         ->setContentType($content->getContentType())
                         ->setContentEncoding($content->getContentEncoding())
                         ->setVclock($pbResponse->getVclock());
@@ -739,9 +740,17 @@ class Pb extends Api implements ApiInterface
         $protocol = $this->node->useTls() ? 'tls' : 'tcp';
         $socket = sprintf('%s://%s', $protocol, $this->node->getUri());
 
-        $this->connection = @stream_socket_client($socket, $errNo, $errMsg, 30, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT);
+        // ct - connection timeout
+        $ct = $this->node->getTimeout();
+
+        $this->connection = @stream_socket_client($socket, $errNo, $errMsg, $ct, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT);
         if ($this->connection === false || $errNo) {
             $this->error = $errNo . ' - ' . $errMsg;
+        } else {
+            $st = $this->node->getStreamTimeout();
+            if (stream_set_timeout($this->connection, $st, 0) === false) {
+                $this->error = 'could not set socket timeouts';
+            }
         }
 
         return $this;
@@ -969,7 +978,8 @@ class Pb extends Api implements ApiInterface
     {
         $bin = stream_get_contents($this->connection, $length);
         if ($bin == FALSE) {
-            throw new Api\Exception("expected to read $length bytes, stream_get_contents() returned FALSE");
+            $md = stream_get_meta_data($this->connection);
+            throw new Api\Exception("expected to read $length bytes, stream_get_contents() returned FALSE. Info: " . json_encode($md));
         }
         if (strlen($bin) != $length) {
             throw new Api\Exception("expected to read $length bytes, read " . sizeof($bin));
