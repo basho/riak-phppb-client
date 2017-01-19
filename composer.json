@@ -45,7 +45,7 @@
     "php": ">=5.5",
     "ext-json": "*",
     "ext-curl": "*",
-    "google/protobuf": "v3.1.0"
+    "google/protobuf": "v3.2.0-rc.1"
   },
   "require-dev": {
     "phpunit/phpunit": "4.5.*",

@@ -9,7 +9,9 @@ use Basho\Riak\Api\Pb\Message\MapField;
 use Basho\Riak\Api\Pb\Message\MapEntry;
 use Basho\Riak\Api\Pb\Message\MapUpdate;
 use Basho\Riak\Api\Pb\Message\MapField_MapFieldType;
+use Basho\Riak\Api\Pb\Message\MapUpdate_FlagOp;
 use Basho\Riak\Command;
+use Google\Protobuf\Internal;
 
 class DataType
 {
@@ -46,8 +48,19 @@ class DataType
     public static function buildSetOp(array $adds, array $removes, $returnAsDt = false)
     {
         $sop = new Pb\Message\SetOp();
-        $sop->setAdds($adds);
-        $sop->setRemoves($removes);
+
+        $addRepeated = new Internal\RepeatedField(Internal\GPBType::BYTES);
+        foreach ($adds as $add) {
+            $addRepeated[] = $add;
+        }
+
+        $sop->setAdds($addRepeated);
+
+        $removesRepeated = new Internal\RepeatedField(Internal\GPBType::BYTES);
+        foreach ($removes as $removes) {
+            $removesRepeated[] = $removes;
+        }
+        $sop->setRemoves($removesRepeated);
 
         if ($returnAsDt) {
             $op = new Pb\Message\DtOp();
@@ -70,9 +83,11 @@ class DataType
     {
         $sop = new Pb\Message\HllOp();
 
+        $addRepeated = new Internal\RepeatedField(Internal\GPBType::BYTES);
         foreach ($adds as $add) {
-            $sop->appendAdds($add);
+            $addRepeated[] = $add;
         }
+        $sop->setAdds($addRepeated);
 
         if ($returnAsDt) {
             $op = new Pb\Message\DtOp();
@@ -96,13 +111,13 @@ class DataType
     {
         $mop = new Pb\Message\MapOp();
 
-        $map_updates = [];
+        $map_updates = new Internal\RepeatedField(Internal\GPBType::MESSAGE, \Basho\Riak\Api\Pb\Message\MapUpdate::class);
         foreach ($updates as $key => $update) {
             $map_updates[] = static::commandToMapUpdate($key, $update);
         }
         $mop->setUpdates($map_updates);
 
-        $map_removes = [];
+        $map_removes = new Internal\RepeatedField(Internal\GPBType::MESSAGE, \Basho\Riak\Api\Pb\Message\MapField::class);
         foreach ($removes as $remove) {
             $map_removes[] = static::compKeyToMapField($remove);
         }
@@ -168,20 +183,23 @@ class DataType
 
         switch ($field->getType()) {
             case MapField_MapFieldType::COUNTER:
-                $mapUpdate->setCounterOp(static::buildCounterOp($update));
+                $cop = static::buildCounterOp($update);
+                $mapUpdate->setCounterOp($cop);
                 break;
             case MapField_MapFieldType::SET:
                 $adds = !empty($update['add_all']) ? $update['add_all'] : [];
                 $removes = !empty($update['remove_all']) ? $update['remove_all'] : [];
-                $mapUpdate->setSetOp(static::buildSetOp($adds, $removes));
+                $sop = static::buildSetOp($adds, $removes);
+                $mapUpdate->setSetOp($sop);
                 break;
             case MapField_MapFieldType::MAP:
                 $updates = !empty($update['update']) ? $update['update'] : [];
                 $removes = !empty($update['remove']) ? $update['remove'] : [];
-                $mapUpdate->setMapOp(static::buildMapOp($updates, $removes));
+                $mop = static::buildMapOp($updates, $removes);
+                $mapUpdate->setMapOp($mop);
                 break;
             case MapField_MapFieldType::FLAG:
-                $mapUpdate->setFlagOp($update == 'enable' ? MapUpdate\FlagOp::ENABLE : MapUpdate\FlagOp::DISABLE);
+                $mapUpdate->setFlagOp($update == 'enable' ? MapUpdate_FlagOp::ENABLE : MapUpdate_FlagOp::DISABLE);
                 break;
             case MapField_MapFieldType::REGISTER:
                 $mapUpdate->setRegisterOp($update);

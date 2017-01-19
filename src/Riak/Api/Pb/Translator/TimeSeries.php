@@ -9,6 +9,7 @@ use Basho\Riak\TimeSeries\Cell;
 use Basho\Riak\Api\Pb\Message\RpbPair;
 use Basho\Riak\Api\Pb\Message\TsInterpolation;
 use Basho\Riak\Api\Pb\Message\TsRow;
+use Google\Protobuf\Internal;
 
 class TimeSeries
 {
@@ -91,8 +92,8 @@ class TimeSeries
     {
         $tsRow = new TsRow();
 
-        $cells = [];
-        foreach($row as $cell) {
+        $cells = new Internal\RepeatedField(Internal\GPBType::MESSAGE, \Basho\Riak\Api\Pb\Message\TsCell::class);
+        foreach ($row as $cell) {
             $cells[] = static::toPbCell($cell);
         }
         $tsRow->setCells($cells);

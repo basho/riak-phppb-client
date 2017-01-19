@@ -780,7 +780,8 @@ class Pb extends Api implements ApiInterface
     protected function buildCounterUpdateMessage($increment)
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataType::buildCounterOp($increment, true));
+        $op = Api\Pb\Translator\DataType::buildCounterOp($increment, true);
+        $message->setOp($op);
 
         return $message;
     }
@@ -793,7 +794,8 @@ class Pb extends Api implements ApiInterface
     protected function buildSetUpdateMessage(array $adds = [], array $removes = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataType::buildSetOp($adds, $removes, true));
+        $op = Api\Pb\Translator\DataType::buildSetOp($adds, $removes, true);
+        $message->setOp($op);
 
         return $message;
     }
@@ -805,7 +807,8 @@ class Pb extends Api implements ApiInterface
     protected function buildHllUpdateMessage(array $adds = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataType::buildHllOp($adds, true));
+        $op = Api\Pb\Translator\DataType::buildHllOp($adds, true);
+        $message->setOp($op);
 
         return $message;
     }
@@ -819,7 +822,8 @@ class Pb extends Api implements ApiInterface
     protected function buildMapUpdateMessage(array $updates = [], array $removes = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataType::buildMapOp($updates, $removes, true));
+        $op = Api\Pb\Translator\DataType::buildMapOp($updates, $removes, true);
+        $message->setOp($op);
 
         return $message;
     }
