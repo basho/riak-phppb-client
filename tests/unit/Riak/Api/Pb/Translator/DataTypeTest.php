@@ -5,6 +5,7 @@ namespace Basho\Tests\Riak\Api\Pb\Translator;
 use Basho\Riak\Api\Pb\Message\CounterOp;
 use Basho\Riak\Api\Pb\Message\MapOp;
 use Basho\Riak\Api\Pb\Message\MapUpdate\FlagOp;
+use Basho\Riak\Api\Pb\Message\GSetOp;
 use Basho\Riak\Api\Pb\Message\SetOp;
 use Basho\Riak\Api\Pb\Translator\DataType;
 use Basho\Tests\TestCase;
@@ -56,6 +57,18 @@ class DataTypeTest extends TestCase
         $this->counterOpAssertions($op->getCounterOp());
     }
 
+    public function testBuildGSetOp()
+    {
+        $op = DataType::buildGSetOp(static::$setAdds, false);
+
+        $this->gsetOpAssertions($op);
+
+        $op = DataType::buildGSetOp(static::$setAdds, true);
+
+        $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\DtOp', $op);
+        $this->gsetOpAssertions($op->getGsetOp());
+    }
+
     public function testBuildSetOp()
     {
         $op = DataType::buildSetOp(static::$setAdds, static::$setRemoves, false);
@@ -84,6 +97,13 @@ class DataTypeTest extends TestCase
     {
         $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\CounterOp', $op);
         $this->assertEquals(static::COUNTER_INCREMENT, $op->getIncrement());
+    }
+
+    public function gsetOpAssertions(GSetOp $op)
+    {
+        $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\GSetOp', $op);
+        $this->assertEquals(3, $op->getAddsCount());
+        $this->assertEquals(static::$setAdds, $op->getAdds());
     }
 
     public function setOpAssertions(SetOp $op)

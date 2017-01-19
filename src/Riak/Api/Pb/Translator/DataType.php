@@ -35,6 +35,31 @@ class DataType
     }
 
     /**
+     * Builds the Protobuff proto Op object for GSets
+     *
+     * @param array $adds
+     * @param bool|false $returnAsDt
+     * @return Pb\Message\DtOp|Pb\Message\GSetOp
+     */
+    public static function buildGSetOp(array $adds, $returnAsDt = false)
+    {
+        $sop = new Pb\Message\GSetOp();
+
+        foreach ($adds as $add) {
+            $sop->appendAdds($add);
+        }
+
+        if ($returnAsDt) {
+            $op = new Pb\Message\DtOp();
+            $op->setGsetOp($sop);
+
+            return $op;
+        }
+
+        return $sop;
+    }
+
+    /**
      * Builds the Protobuff proto Op object for Sets
      *
      * @param array $adds
