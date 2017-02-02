@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_dt.proto at 2016-09-24 09:49:42
+ * Auto generated from riak_dt.proto at 2017-02-01 19:18:33
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -85,7 +85,7 @@ class MapField extends \ProtobufMessage
     /**
      * Sets value of 'type' property
      *
-     * @param int $value Property value
+     * @param MapFieldType $value Property value
      *
      * @return null
      */
@@ -97,7 +97,7 @@ class MapField extends \ProtobufMessage
     /**
      * Returns value of 'type' property
      *
-     * @return int
+     * @return MapFieldType
      */
     public function getType()
     {

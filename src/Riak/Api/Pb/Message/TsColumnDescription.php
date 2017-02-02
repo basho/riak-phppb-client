@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_ts.proto at 2016-09-24 09:49:42
+ * Auto generated from riak_ts.proto at 2017-02-01 19:18:34
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -85,7 +85,7 @@ class TsColumnDescription extends \ProtobufMessage
     /**
      * Sets value of 'type' property
      *
-     * @param int $value Property value
+     * @param TsColumnType $value Property value
      *
      * @return null
      */
@@ -97,7 +97,7 @@ class TsColumnDescription extends \ProtobufMessage
     /**
      * Returns value of 'type' property
      *
-     * @return int
+     * @return TsColumnType
      */
     public function getType()
     {

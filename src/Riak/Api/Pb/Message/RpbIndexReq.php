@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak_kv.proto at 2016-09-24 09:49:42
+ * Auto generated from riak_kv.proto at 2017-02-01 19:18:33
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -205,7 +205,7 @@ class RpbIndexReq extends \ProtobufMessage
     /**
      * Sets value of 'qtype' property
      *
-     * @param int $value Property value
+     * @param IndexQueryType $value Property value
      *
      * @return null
      */
@@ -217,7 +217,7 @@ class RpbIndexReq extends \ProtobufMessage
     /**
      * Returns value of 'qtype' property
      *
-     * @return int
+     * @return IndexQueryType
      */
     public function getQtype()
     {

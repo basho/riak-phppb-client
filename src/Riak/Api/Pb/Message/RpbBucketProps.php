@@ -1,6 +1,6 @@
 <?php
 /**
- * Auto generated from riak.proto at 2016-09-24 09:49:42
+ * Auto generated from riak.proto at 2017-02-01 19:18:33
  *
  * Basho\Riak\Api\Pb\Message package
  */
@@ -41,6 +41,7 @@ class RpbBucketProps extends \ProtobufMessage
     const CONSISTENT = 27;
     const WRITE_ONCE = 28;
     const HLL_PRECISION = 29;
+    const TTL = 30;
 
     /* @var array Field descriptors */
     protected static $fields = array(
@@ -191,6 +192,11 @@ class RpbBucketProps extends \ProtobufMessage
             'required' => false,
             'type' => 5,
         ),
+        self::TTL => array(
+            'name' => 'ttl',
+            'required' => false,
+            'type' => 5,
+        ),
     );
 
     /**
@@ -239,6 +245,7 @@ class RpbBucketProps extends \ProtobufMessage
         $this->values[self::CONSISTENT] = null;
         $this->values[self::WRITE_ONCE] = null;
         $this->values[self::HLL_PRECISION] = null;
+        $this->values[self::TTL] = null;
     }
 
     /**
@@ -844,7 +851,7 @@ class RpbBucketProps extends \ProtobufMessage
     /**
      * Sets value of 'repl' property
      *
-     * @param int $value Property value
+     * @param RpbReplMode $value Property value
      *
      * @return null
      */
@@ -856,7 +863,7 @@ class RpbBucketProps extends \ProtobufMessage
     /**
      * Returns value of 'repl' property
      *
-     * @return int
+     * @return RpbReplMode
      */
     public function getRepl()
     {
@@ -971,6 +978,28 @@ class RpbBucketProps extends \ProtobufMessage
     public function getHllPrecision()
     {
         return $this->get(self::HLL_PRECISION);
+    }
+
+    /**
+     * Sets value of 'ttl' property
+     *
+     * @param int $value Property value
+     *
+     * @return null
+     */
+    public function setTtl($value)
+    {
+        return $this->set(self::TTL, $value);
+    }
+
+    /**
+     * Returns value of 'ttl' property
+     *
+     * @return int
+     */
+    public function getTtl()
+    {
+        return $this->get(self::TTL);
     }
 }
 }
