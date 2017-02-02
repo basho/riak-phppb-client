@@ -47,13 +47,13 @@
   },
   "scripts": {
     "build": [
-      "cd vendor/allegro/protobuf && phpize",
-      "cd vendor/allegro/protobuf && ./configure",
-      "cd vendor/allegro/protobuf && make",
+      "cd vendor/basho/protobuf && phpize",
+      "cd vendor/basho/protobuf && ./configure",
+      "cd vendor/basho/protobuf && make",
       "echo 'Run `composer install-extension` and add it to your `php.ini` to install the extension [requires sudo]'"
     ],
-    "install-extension": "cd vendor/allegro/protobuf && sudo make install",
-    "clean": "cd vendor/allegro/protobuf && make distclean",
+    "install-extension": "cd vendor/basho/protobuf && sudo make install",
+    "clean": "cd vendor/basho/protobuf && make distclean",
     "test": [
       "./vendor/bin/phpunit --testsuite=unit-tests",
       "./vendor/bin/phpunit --testsuite=functional-tests",
