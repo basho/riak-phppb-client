@@ -4,7 +4,7 @@
 
 export PB_INTERFACE = 1
 
-PROTOC := ./vendor/bin/protoc
+PROTOC := ./vendor/bin/protoc-gen-php
 PHP_VERSION := $(shell php -r 'echo "php-";echo phpversion();')
 
 all: test
@@ -12,22 +12,22 @@ all: test
 test: unit-test integration-test scenario-test
 
 unit-test:
-	@php ./vendor/bin/phpunit --testsuite=unit-tests
+	./vendor/bin/phpunit --testsuite=unit-tests
 
 integration-test:
-	@php ./vendor/bin/phpunit --testsuite=functional-tests
+	./vendor/bin/phpunit --testsuite=functional-tests
 
 scenario-test:
-	@php ./vendor/bin/phpunit  --testsuite=scenario-tests
+	./vendor/bin/phpunit  --testsuite=scenario-tests
 
 security-test:
-	@php ./vendor/bin/phpunit --testsuite=security-tests
+	./vendor/bin/phpunit --testsuite=security-tests
 
 install-deps: install-composer
 	@./composer install
 
 timeseries-test:
-	@php ./vendor/bin/phpunit vendor/basho/riak/tests/functional/TimeSeriesOperationsTest.php
+	./vendor/bin/phpunit vendor/basho/riak/tests/functional/TimeSeriesOperationsTest.php
 
 install-composer: composer
 
@@ -49,14 +49,13 @@ composer:
 
 protogen:
 	mkdir -p src/Basho
-	mv -f src/Riak src/Basho/Riak
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak_dt.proto
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak_kv.proto
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak.proto
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak_search.proto
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak_ts.proto
 	$(PROTOC) --package='Basho\Riak\Api\Pb\Message' --use-namespaces --psr --destination='src/' riak_pb/src/riak_yokozuna.proto
-	mv -f src/Basho/Riak src/Riak
+	cp -Rfv src/Basho/Riak/Api/Pb/Message/* src/Riak/Api/Pb/Message/
 	rm -rf src/Basho
 	rm -f pb_proto_riak.php
 
