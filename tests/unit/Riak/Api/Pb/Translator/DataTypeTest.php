@@ -4,7 +4,7 @@ namespace Basho\Tests\Riak\Api\Pb\Translator;
 
 use Basho\Riak\Api\Pb\Message\CounterOp;
 use Basho\Riak\Api\Pb\Message\MapOp;
-use Basho\Riak\Api\Pb\Message\MapUpdate\FlagOp;
+use Basho\Riak\Api\Pb\Message\MapUpdate_FlagOp;
 use Basho\Riak\Api\Pb\Message\SetOp;
 use Basho\Riak\Api\Pb\Translator\DataType;
 use Basho\Tests\TestCase;
@@ -68,6 +68,19 @@ class DataTypeTest extends TestCase
         $this->setOpAssertions($op->getSetOp());
     }
 
+    public function testBuildHllOp()
+    {
+        $op = DataType::buildHllOp(static::$setAdds, false);
+
+        $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\HllOp', $op);
+        $this->assertEquals(3, count($op->getAdds()));
+
+        $op = DataType::buildHllOp(static::$setAdds, true);
+
+        $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\DtOp', $op);
+        $this->assertEquals(3, count($op->getHllOp()->getAdds()));
+    }
+
     public function testBuildMapOp()
     {
         $op = DataType::buildMapOp(static::$mapUpdates, static::$mapRemoves, false);
@@ -89,17 +102,17 @@ class DataTypeTest extends TestCase
     public function setOpAssertions(SetOp $op)
     {
         $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\SetOp', $op);
-        $this->assertEquals(3, $op->getAddsCount());
-        $this->assertEquals(3, $op->getRemovesCount());
-        $this->assertEquals(static::$setAdds, $op->getAdds());
-        $this->assertEquals(static::$setRemoves, $op->getRemoves());
+        $this->assertEquals(3, count($op->getAdds()));
+        $this->assertEquals(3, count($op->getRemoves()));
+        $this->assertEquals(static::$setAdds[0], $op->getAdds()[0]);
+        $this->assertEquals(static::$setRemoves[0], $op->getRemoves()[0]);
     }
 
     public function mapOpAssertions(MapOp $op)
     {
         $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\MapOp', $op);
-        $this->assertEquals(5, $op->getUpdatesCount());
-        $this->assertEquals(1, $op->getRemovesCount());
+        $this->assertEquals(5, count($op->getUpdates()));
+        $this->assertEquals(1, count($op->getRemoves()));
 
         foreach ($op->getUpdates() as $update) {
             switch (DataType::mapFieldToCompKey($update->getField())) {
@@ -107,7 +120,7 @@ class DataTypeTest extends TestCase
                     $this->setOpAssertions($update->getSetOp());
                     break;
                 case 'clinch_playoffs_flag':
-                    $this->assertEquals(FlagOp::DISABLE, $update->getFlagOp());
+                    $this->assertEquals(MapUpdate_FlagOp::DISABLE, $update->getFlagOp());
                     break;
                 case 'win_counter':
                     $this->counterOpAssertions($update->getCounterOp());
@@ -117,8 +130,8 @@ class DataTypeTest extends TestCase
                     break;
                 case 'farm_team_map':
                     $this->assertInstanceOf('Basho\Riak\Api\Pb\Message\MapOp', $update->getMapOp());
-                    $this->assertEquals(2, $update->getMapOp()->getUpdatesCount());
-                    $this->assertEquals(0, $update->getMapOp()->getRemovesCount());
+                    $this->assertEquals(2, count($update->getMapOp()->getUpdates()));
+                    $this->assertEquals(0, count($update->getMapOp()->getRemoves()));
                     break;
                 default:
                     $this->assertTrue(false);

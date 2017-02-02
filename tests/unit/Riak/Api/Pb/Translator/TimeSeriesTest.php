@@ -22,11 +22,11 @@ class TimeSeriesTest extends TestCase
 
         $tsRow = TimeSeries::toPbRow($row);
 
-        $this->assertEquals('test', $tsRow->getCellsAt(0)->getVarcharValue());
-        $this->assertEquals(1, $tsRow->getCellsAt(1)->getSint64Value());
-        $this->assertEquals(1.1, $tsRow->getCellsAt(2)->getDoubleValue());
-        $this->assertEquals(true, $tsRow->getCellsAt(3)->getBooleanValue());
-        $this->assertEquals($now->getTimestamp(), $tsRow->getCellsAt(4)->getTimestampValue());
-        $this->assertEquals($now->getTimestamp(), $tsRow->getCellsAt(5)->getTimestampValue());
+        $this->assertEquals('test', $tsRow->getCells()[0]->getVarcharValue());
+        $this->assertEquals(1, $tsRow->getCells()[1]->getSint64Value());
+        $this->assertEquals(1.1, $tsRow->getCells()[2]->getDoubleValue());
+        $this->assertEquals(true, $tsRow->getCells()[3]->getBooleanValue());
+        $this->assertEquals($now->getTimestamp(), $tsRow->getCells()[4]->getTimestampValue());
+        $this->assertEquals($now->getTimestamp(), $tsRow->getCells()[5]->getTimestampValue());
     }
 }

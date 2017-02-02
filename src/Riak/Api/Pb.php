@@ -2,6 +2,13 @@
 
 namespace Basho\Riak\Api;
 
+require_once 'Pb/Message/riak.pb.php';
+require_once 'Pb/Message/riak_dt.pb.php';
+require_once 'Pb/Message/riak_kv.pb.php';
+require_once 'Pb/Message/riak_search.pb.php';
+require_once 'Pb/Message/riak_ts.pb.php';
+require_once 'Pb/Message/riak_yokozuna.pb.php';
+
 use Basho\Riak\Api;
 use Basho\Riak\ApiInterface;
 use Basho\Riak\Bucket;
@@ -34,14 +41,14 @@ class Pb extends Api implements ApiInterface
     /**
      * PB message to be sent
      *
-     * @var \ProtobufMessage|null
+     * @var \Google\Protobuf\Internal\Message|null
      */
     protected $requestMessage = null;
 
     /**
      * PB response received
      *
-     * @var \ProtobufMessage|null
+     * @var \Google\Protobuf\Internal\Message|null
      */
     protected $responseMessage = null;
 
@@ -114,7 +121,8 @@ class Pb extends Api implements ApiInterface
                 $this->messageCode = Api\Pb\Message::RpbPutReq;
                 $message = new Api\Pb\Message\RpbPutReq();
                 $message->setVclock($this->command->getObject()->getVclock());
-                $message->setContent($this->prepareContent());
+                $content = $this->prepareContent();
+                $message->setContent($content);
                 break;
             case 'Basho\Riak\Command\Object\Delete':
                 $this->messageCode = Api\Pb\Message::RpbDelReq;
@@ -357,7 +365,7 @@ class Pb extends Api implements ApiInterface
         switch ($message_code) {
             case Api\Pb\Message::RpbErrorResp:
                 $pbResponse = new Api\Pb\Message\RpbErrorResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
                 $this->error = $pbResponse->getErrmsg();
 
                 // intercept certain "errors" to provide consistent cross interface behavior
@@ -383,7 +391,7 @@ class Pb extends Api implements ApiInterface
                 break;
             case Api\Pb\Message::RpbPutResp:
                 $pbResponse = new Api\Pb\Message\RpbPutResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 if ($pbResponse->getKey()) {
                     $code = 201;
@@ -421,7 +429,7 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::RpbGetResp:
                 $code = 404;
                 $pbResponse = new Api\Pb\Message\RpbGetResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 $objects = [];
                 foreach ($pbResponse->getContent() as $content) {
@@ -464,7 +472,7 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::RpbGetBucketKeyPreflistResp:
                 $code = 200;
                 $pbResponse = new Api\Pb\Message\RpbGetBucketKeyPreflistResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 $items = [];
                 foreach ($pbResponse->getPreflist() as $preflistItem) {
@@ -492,7 +500,7 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::RpbGetBucketResp:
                 $code = 200;
                 $pbResponse = new Api\Pb\Message\RpbGetBucketResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
                 $pbProps = $pbResponse->getProps();
 
                 $props = [];
@@ -506,7 +514,7 @@ class Pb extends Api implements ApiInterface
                 break;
             case Api\Pb\Message::DtUpdateResp:
                 $pbResponse = new Api\Pb\Message\DtUpdateResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 if ($pbResponse->getKey()) {
                     $code = 201;
@@ -538,7 +546,7 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::DtFetchResp:
                 $code = 200;
                 $pbResponse = new Api\Pb\Message\DtFetchResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 // if value is null, the DT couldn't be found
                 if ($pbResponse->getValue()) {
@@ -570,7 +578,7 @@ class Pb extends Api implements ApiInterface
                 $code = null;
                 $results = [];
                 $pbResponse = new Api\Pb\Message\RpbMapRedResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 while ($code === null) {
                     if (!$pbResponse->getDone()) {
@@ -584,7 +592,7 @@ class Pb extends Api implements ApiInterface
                         }
                         $message = $this->readMessage($length);
                         $pbResponse = new Api\Pb\Message\RpbMapRedResp();
-                        $pbResponse->parseFromString($message);
+                        $pbResponse->decode($message);
                     } else {
                         // All responses from Riak are complete, return a 200 code
                         $code = 200;
@@ -597,7 +605,7 @@ class Pb extends Api implements ApiInterface
                 $code = 200;
                 $docs = [];
                 $pbResponse = new Api\Pb\Message\RpbSearchQueryResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 foreach ($pbResponse->getDocs() as $pbDoc) {
                     $doc = new \stdClass();
@@ -612,25 +620,29 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::RpbYokozunaIndexGetResp:
                 $code = 200;
                 $pbResponse = new Api\Pb\Message\RpbYokozunaIndexGetResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
+
                 $index = new \stdClass();
-                $index->name = $pbResponse->getIndexAt(0)->getName();
-                $index->n_val = $pbResponse->getIndexAt(0)->getNVal();
-                $index->schema = $pbResponse->getIndexAt(0)->getSchema();
+                if ($pbResponse->getIndex()->count()) {
+                    $index_resp = $pbResponse->getIndex()->offsetGet(0);
+                    $index->name = $index_resp->getName();
+                    $index->n_val = $index_resp->getNVal();
+                    $index->schema = $index_resp->getSchema();
+                }
 
                 $this->response = new Command\Search\Index\Response($this->success, $code, '', $index);
                 break;
             case Api\Pb\Message::RpbYokozunaSchemaGetResp:
                 $code = 200;
                 $pbResponse = new Api\Pb\Message\RpbYokozunaSchemaGetResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 $this->response = new Command\Search\Schema\Response($this->success, $code, '', $pbResponse->getSchema()->getContent(), Http::CONTENT_TYPE_XML);
                 break;
             case Api\Pb\Message::RpbIndexResp:
                 $code = 200;
                 $pbResponse = new Api\Pb\Message\RpbIndexResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 // sane defaults
                 $results = [];
@@ -665,7 +677,7 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::TsGetResp:
                 $this->success = true;
                 $pbResponse = new Api\Pb\Message\TsGetResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 $rows = [];
                 foreach($pbResponse->getRows() as $row) {
@@ -677,7 +689,7 @@ class Pb extends Api implements ApiInterface
             case Api\Pb\Message::TsQueryResp:
                 $this->success = true;
                 $pbResponse = new Api\Pb\Message\TsQueryResp();
-                $pbResponse->parseFromString($message);
+                $pbResponse->decode($message);
 
                 $rows = [];
                 foreach($pbResponse->getRows() as $row) {
@@ -709,9 +721,11 @@ class Pb extends Api implements ApiInterface
 
         // append secondary indexes to the Content object
         foreach ($command->getObject()->getIndexes() as $key => $values) {
+            $indexes = [];
             foreach ($values as $value) {
-                $content->appendIndexes($this->toRpbPair($key, $value));
+                $indexes[] = $this->toRpbPair($key, $value);
             }
+            $content->setIndexes($indexes);
         }
 
         return $content;
@@ -766,7 +780,8 @@ class Pb extends Api implements ApiInterface
     protected function buildCounterUpdateMessage($increment)
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataType::buildCounterOp($increment, true));
+        $op = Api\Pb\Translator\DataType::buildCounterOp($increment, true);
+        $message->setOp($op);
 
         return $message;
     }
@@ -779,7 +794,8 @@ class Pb extends Api implements ApiInterface
     protected function buildSetUpdateMessage(array $adds = [], array $removes = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataType::buildSetOp($adds, $removes, true));
+        $op = Api\Pb\Translator\DataType::buildSetOp($adds, $removes, true);
+        $message->setOp($op);
 
         return $message;
     }
@@ -791,7 +807,8 @@ class Pb extends Api implements ApiInterface
     protected function buildHllUpdateMessage(array $adds = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataType::buildHllOp($adds, true));
+        $op = Api\Pb\Translator\DataType::buildHllOp($adds, true);
+        $message->setOp($op);
 
         return $message;
     }
@@ -805,16 +822,17 @@ class Pb extends Api implements ApiInterface
     protected function buildMapUpdateMessage(array $updates = [], array $removes = [])
     {
         $message = $this->buildDataTypeMessage();
-        $message->setOp(Api\Pb\Translator\DataType::buildMapOp($updates, $removes, true));
+        $op = Api\Pb\Translator\DataType::buildMapOp($updates, $removes, true);
+        $message->setOp($op);
 
         return $message;
     }
 
     /**
-     * @param Pb\Message\RpbGetReq|Pb\Message\RpbPutReq|\ProtobufMessage $message
+     * @param Pb\Message\RpbGetReq|Pb\Message\RpbPutReq|\Google\Protobuf\Internal\Message $message
      * @param Location|null $location
      */
-    protected function setLocationOnMessage(\ProtobufMessage &$message, Location $location = null)
+    protected function setLocationOnMessage(\Google\Protobuf\Internal\Message &$message, Location $location = null)
     {
         if (!empty($location)) {
             $message->setKey($location->getKey());
@@ -822,10 +840,10 @@ class Pb extends Api implements ApiInterface
     }
 
     /**
-     * @param Pb\Message\RpbGetReq|Pb\Message\RpbPutReq|\ProtobufMessage $message
+     * @param Pb\Message\RpbGetReq|Pb\Message\RpbPutReq|\Google\Protobuf\Internal\Message $message
      * @param Bucket|null $bucket
      */
-    protected function setBucketOnMessage(\ProtobufMessage &$message, Bucket $bucket = null)
+    protected function setBucketOnMessage(\Google\Protobuf\Internal\Message &$message, Bucket $bucket = null)
     {
         if (!empty($bucket)) {
             $message->setBucket($bucket->getName());
@@ -834,10 +852,10 @@ class Pb extends Api implements ApiInterface
     }
 
     /**
-     * @param \ProtobufMessage|Api\Pb\Message\RpbGetReq|Api\Pb\Message\RpbPutReq|Api\Pb\Message\RpbDelReq $message
+     * @param \Google\Protobuf\Internal\Message|Api\Pb\Message\RpbGetReq|Api\Pb\Message\RpbPutReq|Api\Pb\Message\RpbDelReq $message
      * @param Command $command
      */
-    protected function setOptionsOnMessage(\ProtobufMessage &$message, Command $command)
+    protected function setOptionsOnMessage(\Google\Protobuf\Internal\Message &$message, Command $command)
     {
         if ($command->getParameter('n_val')) {
             $message->setNVal($command->getParameter('n_val'));
