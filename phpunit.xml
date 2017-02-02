@@ -18,6 +18,7 @@
         <testsuite name="scenario-tests">
             <directory>tests/scenario</directory>
             <directory>vendor/basho/riak/tests/scenario</directory>
+            <exclude>vendor/basho/riak/tests/scenario/InternalServerErrorTest.php</exclude>
         </testsuite>
     </testsuites>
     <filter>
