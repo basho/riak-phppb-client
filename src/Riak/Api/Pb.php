@@ -79,10 +79,6 @@ class Pb extends Api implements ApiInterface
         $message = null;
 
         switch (get_class($this->command)) {
-            case 'Basho\Riak\Command\Bucket\List':
-                $this->messageCode = Api\Pb\Message::RpbListBucketsReq;
-                $message = new Api\Pb\Message\RpbListBucketsReq();
-                break;
             case 'Basho\Riak\Command\Bucket\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbGetBucketReq;
                 $message = new Api\Pb\Message\RpbGetBucketReq();
@@ -101,10 +97,6 @@ class Pb extends Api implements ApiInterface
             case 'Basho\Riak\Command\Bucket\Delete':
                 $this->messageCode = Api\Pb\Message::RpbPutReq;
                 $message = new Api\Pb\Message\RpbPutReq();
-                break;
-            case 'Basho\Riak\Command\Bucket\Keys':
-                $this->messageCode = Api\Pb\Message::RpbListKeysReq;
-                $message = new Api\Pb\Message\RpbListKeysReq();
                 break;
             case 'Basho\Riak\Command\Object\Fetch':
                 $this->messageCode = Api\Pb\Message::RpbGetReq;
