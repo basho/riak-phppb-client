@@ -45,7 +45,7 @@
     "php": ">=5.5",
     "ext-json": "*",
     "ext-curl": "*",
-    "allegro/protobuf": "^1.0"
+    "basho/protobuf": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "4.5.*",

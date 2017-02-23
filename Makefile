@@ -32,7 +32,7 @@ timeseries-test:
 install-composer: composer
 
 install-protobuf: install-deps
-	cd vendor/allegro/protobuf && \
+	cd vendor/basho/protobuf && \
 		phpize && \
 		./configure && \
 		$(MAKE) && \
