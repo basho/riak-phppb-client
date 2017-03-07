@@ -117,6 +117,7 @@ class Pb extends Api implements ApiInterface
                 $message = new Api\Pb\Message\RpbGetBucketKeyPreflistReq();
                 break;
             case 'Basho\Riak\Command\DataType\Counter\Fetch':
+            case 'Basho\Riak\Command\DataType\GSet\Fetch':
             case 'Basho\Riak\Command\DataType\Set\Fetch':
             case 'Basho\Riak\Command\DataType\Map\Fetch':
             case 'Basho\Riak\Command\DataType\Hll\Fetch':
@@ -125,6 +126,10 @@ class Pb extends Api implements ApiInterface
                 break;
             case 'Basho\Riak\Command\DataType\Counter\Store':
                 $message = $this->buildCounterUpdateMessage($this->command->getData()['increment']);
+                break;
+            case 'Basho\Riak\Command\DataType\GSet\Store':
+                $data = $this->command->getData();
+                $message = $this->buildGSetUpdateMessage($data['add_all']);
                 break;
             case 'Basho\Riak\Command\DataType\Set\Store':
                 $data = $this->command->getData();
@@ -511,6 +516,9 @@ class Pb extends Api implements ApiInterface
                 } elseif ($pbResponse->getSetValueCount()) {
                     $set = new DataType\Set($pbResponse->getSetValue(), $pbResponse->getContext());
                     $this->response = new Command\DataType\Set\Response($this->success, $code, '', $location, $set);
+                } elseif ($pbResponse->getGsetValueCount()) {
+                    $set = new DataType\Set($pbResponse->getGsetValue(), '');
+                    $this->response = new Command\DataType\Set\Response($this->success, $code, '', $location, $set);
                 } elseif ($pbResponse->getMapValueCount()) {
                     $map = new DataType\Map(Api\Pb\Translator\DataType::mapEntriesToArray($pbResponse->getMapValue()), $pbResponse->getContext());
                     $this->response = new Command\DataType\Map\Response($this->success, $code, '', $location, $map);
@@ -518,6 +526,8 @@ class Pb extends Api implements ApiInterface
                     $command = get_class($this->command);
                     if ($command == 'Basho\Riak\Command\DataType\Counter\Store') {
                         $this->response = new Command\DataType\Counter\Response($this->success, $code, '', $location);
+                    } elseif ($command == 'Basho\Riak\Command\DataType\GSet\Store') {
+                        $this->response = new Command\DataType\Set\Response($this->success, $code, '', $location);
                     } elseif ($command == 'Basho\Riak\Command\DataType\Set\Store') {
                         $this->response = new Command\DataType\Set\Response($this->success, $code, '', $location);
                     } elseif ($command == 'Basho\Riak\Command\DataType\Map\Store') {
@@ -538,6 +548,10 @@ class Pb extends Api implements ApiInterface
                         case Api\Pb\Message\DtFetchResp\DataType::COUNTER:
                             $counter = new DataType\Counter($pbResponse->getValue()->getCounterValue());
                             $this->response = new Command\DataType\Counter\Response($this->success, $code, '', null, $counter);
+                            break;
+                        case Api\Pb\Message\DtFetchResp\DataType::GSET:
+                            $set = new DataType\Set($pbResponse->getValue()->getGsetValue(), '');
+                            $this->response = new Command\DataType\Set\Response($this->success, $code, '', null, $set);
                             break;
                         case Api\Pb\Message\DtFetchResp\DataType::SET:
                             $set = new DataType\Set($pbResponse->getValue()->getSetValue(), $pbResponse->getContext());
@@ -759,6 +773,18 @@ class Pb extends Api implements ApiInterface
     {
         $message = $this->buildDataTypeMessage();
         $message->setOp(Api\Pb\Translator\DataType::buildCounterOp($increment, true));
+
+        return $message;
+    }
+
+    /**
+     * @param array $adds
+     * @return Pb\Message\DtUpdateReq
+     */
+    protected function buildGSetUpdateMessage(array $adds = [])
+    {
+        $message = $this->buildDataTypeMessage();
+        $message->setOp(Api\Pb\Translator\DataType::buildGSetOp($adds, true));
 
         return $message;
     }
