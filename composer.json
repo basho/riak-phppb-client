@@ -41,7 +41,7 @@
     }
   ],
   "require": {
-    "basho/riak": "develop",
+    "basho/riak": "dev-develop",
     "php": ">=5.5",
     "ext-json": "*",
     "ext-curl": "*",
